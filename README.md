@@ -10,6 +10,11 @@ just take the link! you know the drill!
 ```html
 <script src="https://raw.githack.com/atoms19/dominity.js/main/dominity.min.js"></script>
  ``` 
+## info to my friends at SL
+use the library if you like,I am away from SL for a long time
+
+# instructions
+very very very brief :(
 
 ## objects
 finder object is used to find an dom element 
