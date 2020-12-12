@@ -10,6 +10,10 @@ just take the link! you know the drill!
 ```html
 <script src="https://raw.githack.com/atoms19/dominity.js/main/dominity.min.js"></script>
  ``` 
+much more efficient and improved one↓
+```html
+<script src="https://raw.githack.com/atoms19/dominity.js/main/dominity%2Cbe.min.js"></script>
+```
 ## info to my friends at SL
 use the library if you like,I am away from SL for a long time
 
