@@ -3,9 +3,8 @@
 dominity is a Dom manipulation library like jQuery I built  myself and for myself only 
 >lightweight replacement for jQuery
 ## should you use it 
-its up to you use it dont use it whatever I don't care it's built for getting my job done
-btw providing this info for the curious people outthere
-and the list of objects and methods are just for me incase I forgot
+its up to you, 
+>it is  tiny just 1.45kb still it gets the job done
 ## how to use it
 just take the link! you know the drill!
 ```html
