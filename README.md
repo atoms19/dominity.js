@@ -1,6 +1,7 @@
 # dominity.js
 ## what is it
 dominity is a Dom manipulation library like jQuery I built  myself and for myself only 
+>lightweight replacement for jQuery
 ## should you use it 
 its up to you use it dont use it whatever I don't care it's built for getting my job done
 btw providing this info for the curious people outthere
