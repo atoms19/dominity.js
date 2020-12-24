@@ -1,9 +1,10 @@
 # dominity.js
 ## what is it
-dominity is a Dom manipulation library like jQuery I built  myself and for myself only 
+dominity is a Dom manipulation library like jQuery I built to working with DOM easier
 >lightweight replacement for jQuery
 ## should you use it 
-its up to you, 
+using dominity makes building websites with interactivity faster
+but its upto you wether you use it or not
 >it is  tiny just 1.45kb still it gets the job done
 ## how to use it
 just take the link! you know the drill!
@@ -14,11 +15,8 @@ much more efficient and improved one↓
 ```html
 <script src="https://raw.githack.com/atoms19/dominity.js/main/dominity%2Cbe.min.js"></script>
 ```
-## info to my friends at SL
-use the library if you like,I am away from SL for a long time
-
 # instructions
-very very very brief :(
+
 
 ## objects
 finder object is used to find an dom element 
