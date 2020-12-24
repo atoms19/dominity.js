@@ -5,7 +5,7 @@ dominity is a Dom manipulation library like jQuery I built to working with DOM e
 ## should you use it 
 using dominity makes building websites with interactivity faster
 but its upto you wether you use it or not
->it is  tiny just 1.45kb still it gets the job done
+>it is  tiny just around 1.45kb still it gets the job done
 ## how to use it
 just take the link! you know the drill!
 ```html
@@ -13,7 +13,7 @@ just take the link! you know the drill!
  ``` 
 much more efficient and improved one↓
 ```html
-<script src="https://raw.githack.com/atoms19/dominity.js/main/dominity%2Cbe.min.js"></script>
+<script src="https://rawcdn.githack.com/atoms19/dominity.js/main/dominityORG.min.js"><script>
 ```
 # instructions
 
