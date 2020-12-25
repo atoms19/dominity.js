@@ -13,7 +13,7 @@ just take the link! you know the drill!
  ``` 
 much more efficient and improved one↓
 ```html
-<script src="https://rawcdn.githack.com/atoms19/dominity.js/main/dominityORG.min.js"><script>
+<script src="https://raw.githack.com/atoms19/dominity.js/main/dominityORG.min.js"><script>
 ```
 # instructions
 
