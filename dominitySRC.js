@@ -94,7 +94,7 @@ const create=(eli,id)=>{
 //repeat
 const repeat=(cd,limit,jump=1,ti=0.07)=>{
     this.cnt=1
-    this.cntrl="this.cnt+="+jump
+    this.cntrl=`this.cnt+=${jump}`
     this.code="()=>{"+cd+";if(this.cnt>="+limit+"){clearInterval(this.inter)}else{"+this.cntrl+"}}"
     this.inter=setInterval(eval(this.code),ti*1000);
 }
@@ -105,5 +105,4 @@ const random=(max,min=0)=>{
     }else{
         return Math.round(Math.random()*(max-min))
     }
-    
 }
