@@ -1,9 +1,4 @@
-
-//pls dont copy this source code it is licensed and violating the terms and copying the code might get you sued 
-
-
-
-
+// pls dont copy this source code it is licensed and violating the terms and copying the code might get you sued 
 
 class finder{
     constructor(el){
@@ -78,37 +73,36 @@ class finder{
 //fuctions 
 
 //timer
-function timer(cd,ti=1){
-    this.code="()=>{"+cd+"}"
+const timer=(cd,ti=1)=>{
+    this.code=`()=>{${cd}}`
     setTimeout(eval(this.code),ti*1000)
-}
+};
 //classmaker
-function makeClass(name,stuff){
+const makeClass=(name,stuff)=>{
     this.class=document.createElement("style")
-    this.stuff="."+name+"{"+stuff+"}"
+    this.stuff=`.${name}{${stuff}}`
     this.class.innerHTML=this.stuff
     document.body.appendChild(this.class)
 }
 //make elem
-function create(eli,id) {
+const create=(eli,id)=>{
     this.element=document.createElement(eli)
     this.element.setAttribute("id",id)
     document.body.appendChild(this.element)
-    return new finder("#"+id)
+    return new finder(`#${id}`)
 }
 //repeat
-function repeat(cd,limit,jump=1,ti=0.07) {
+const repeat=(cd,limit,jump=1,ti=0.07)=>{
     this.cnt=1
-    this.cntrl="this.cnt+="+jump
+    this.cntrl=`this.cnt+=${jump}`
     this.code="()=>{"+cd+";if(this.cnt>="+limit+"){clearInterval(this.inter)}else{"+this.cntrl+"}}"
     this.inter=setInterval(eval(this.code),ti*1000);
 }
 //random
-function random(max,min=0){
+const random=(max,min=0)=>{
     if(Array.isArray(max)==true){
         return max[Math.round(Math.random()*(max.length-min))]
     }else{
         return Math.round(Math.random()*(max-min))
     }
-    
 }
