@@ -69,6 +69,22 @@ class finder{
         this.elem.scrollIntoView(s)
     }
     
+    centerChildren() {
+        this.style("display", "flex");
+        this.style("flexDirection", "column");
+        this.style("alignItems", "center");
+        this.style("justifyContent", "center");
+    }
+    centerChildrenX() {
+        this.style("display", "flex");
+        this.style("flexDirection", "column");
+        this.style("justifyContent", "center");
+    }
+    centerChildrenX() {
+        this.style("display", "flex");
+        this.style("flexDirection", "column");
+        this.style("alignItems", "center");
+    }
 }
 //fuctions 
 
