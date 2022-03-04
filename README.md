@@ -46,3 +46,6 @@ it consists of methods like.
 - `makeClass()`- to create a class
 - `repeat()`- repeat a code specifird times 
 - `random()`-   a simpler math.random()
+
+
+full [docs](https://arnav-kr.github.io/slcodepreview/?q=WFK463px9NrH&nav=0)
