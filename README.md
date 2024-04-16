@@ -1,51 +1,67 @@
-# dominity.js
-## what is it
-dominity is a Dom manipulation library like jQuery I built to working with DOM easier
->lightweight replacement for jQuery
-## should you use it 
-using dominity makes building websites with interactivity faster
-but its upto you wether you use it or not
->it is  tiny just around 1.45kb still it gets the job done
-## how to use it
-just take the link! you know the drill!
-```html
-<script src="https://raw.githack.com/atoms19/dominity.js/main/dominity.min.js"></script>
- ``` 
-much more efficient and improved one↓
-```html
-<script src="https://raw.githack.com/atoms19/dominity.js/main/dominityORG.min.js"></script>
-```
-# instructions
+## Dominity Documentation
 
+### Introduction
+Dominity is a concise JavaScript library designed to streamline HTML and JavaScript integration, focusing on simplifying DOM manipulation and componentization. It offers intuitive methods and utilities for efficiently building interactive web applications.
 
-## objects
-finder object is used to find an dom element 
+### Features
+
+#### Bringing HTML to JavaScript
+Dominity facilitates seamless interaction between HTML and JavaScript through its `el()`, `$el()`, and `$$el()` functions. These functions allow developers to effortlessly create, manipulate, and query DOM elements within JavaScript code.
+
+- `el(typ, txt = '', attrs = {})`: Creates a DOM element of the specified type with optional text content and attributes.
+- `$el(qry)`: Finds and returns a DOM element matching the specified query.
+- `$$el(qry)`: Finds and returns an array of DOM elements matching the specified query.
+
+#### Simplified Componentization
+Dominity simplifies componentization by encapsulating DOM manipulation functions within reusable functions, effectively acting as components. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component props.
+
 ```js
-var btn=new finder("#btn")
+function Counter() {
+  let count = reactable(0).as('count');
+
+  el('div').
+    _el('p', "count: {{count}}").$pa().
+    _el('button', "increment").onClick(() => {
+      count.set(count.value + 1);
+    }).$pa().
+    _el('button', 'decrement').onClick(() => {
+      count.set(count.value - 1);
+    }).
+    $pa().
+    reactTo(count);
+}
 ```
-it consists of methods like.
 
-- ``hide()``-    to hide element
-- `show()`-    to show element
-- `style()`-   to set& get a css property
-- `txt()`-    to set textContent 
-- `html()`-    to set innerHTML 
-- `val()`-     to get& set value
-- `addClass()`- to add a class
-- `removeClass()`-to remove a class
-- `add()`-      to append a child
-- `checkFor()`- eventlistener
-- `attr()`-      to change an attribute
-- `scrollto()`- scroll the page till the element
-- `child()`-    to be a child
+#### Chaining DOM Elements
+Dominity enables chaining of DOM elements using `_el()` and `$pa()` methods, allowing developers to efficiently construct complex DOM structures in a concise and readable manner.
 
-# functions are
+```js
+el('div')._el('p', "Paragraph 1").$pa()._el('p', "Paragraph 2").$pa();
+```
 
-- `timer()`-   same as setTimeout
-- `create()`-  create an element 
-- `makeClass()`- to create a class
-- `repeat()`- repeat a code specifird times 
-- `random()`-   a simpler math.random()
+#### Reactivity Support
+Dominity simplifies reactivity management by providing `reactable().as('')`, `reactTo()`, and `set` methods, leveraging a publish-subscribe model for efficient state management. Developers can easily define reactive states and update DOM elements accordingly.
 
+```js
+let count = reactable(0).as('count');
+count.subscribe((state) => {
+  console.log(`Count: ${state.value}`);
+});
+count.set(10);
+```
 
-full [docs](https://arnav-kr.github.io/slcodepreview/?q=WFK463px9NrH&nav=0)
+### Utility Functions
+Dominity offers utility functions for common tasks, including copying text and generating random values.
+
+- `copy(txt)`: Copies the specified text to the clipboard.
+- `random(end, start = 0)`: Generates a random value within the specified range.
+- `range(s, e, increment = 1)`: Generates an array of numbers within the specified range.
+
+```js
+copy("Hello, world!");
+let randomNumber = random(1, 100);
+let numberRange = range(1, 10);
+```
+
+### Conclusion
+Dominity provides developers with essential tools for efficient DOM manipulation, componentization, and reactivity management, empowering them to create dynamic and responsive web applications .
