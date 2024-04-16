@@ -1,4 +1,4 @@
-## Dominity Documentation
+## Dominity js
 
 ### Introduction
 Dominity is a concise JavaScript library designed to streamline HTML and JavaScript integration, focusing on simplifying DOM manipulation and componentization. It offers intuitive methods and utilities for efficiently building interactive web applications.
