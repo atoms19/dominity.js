@@ -1,5 +1,5 @@
-class finder{ 
-  
+class DominityElement{ 
+
    constructor (qry){ 
      if(typeof qry=='string'){ 
        this.elem=document.querySelector(qry) 
@@ -9,9 +9,12 @@ class finder{
      //properties goes here 
      this.finderElem=true 
      this.childCount=this.elem.childElementCount 
-     this.tag=this.elem.tagName 
+     this.tag=this.elem.tagName
+
+    
    } 
-  
+   
+
    //content updation 
    text(val=null){ 
      if(val==null){ 
@@ -20,7 +23,31 @@ class finder{
        this.elem.textContent=val 
        return this 
      } 
-   } 
+   }
+   
+   //reactive states
+   reactTo(...s){
+     
+     let template=this.html()
+    s.forEach((r)=>{
+     r.subscribe((t)=>{
+       if(typeof t.value!='object'){
+      this.text(template.replace(new RegExp('{{'+r.name+'}}','gi'),t.value))
+       }else{
+         
+         Object.keys(t.value).forEach((k)=>{
+           this.html(template.replace(new RegExp('{{'+r.name+'.'+k+'}}','gi'),t.value[k]))
+           template=this.html()
+         })
+       }
+      
+     })
+     r.update()
+    })
+   
+    return this
+   }
+   
    html(val=null){ 
      if(val==null){ 
        return this.elem.innerHTML 
@@ -29,6 +56,7 @@ class finder{
        return this 
      } 
    } 
+   
    code(val=null){ 
      if(val==null){ 
        return this.elem.outerHTML 
@@ -37,7 +65,7 @@ class finder{
        return this 
      } 
    } 
-  
+
    //content addition 
    addText(val=''){ 
      this.elem.textContent+=val 
@@ -52,18 +80,21 @@ class finder{
      return this 
    } 
   keyWords(obj){
-    
-    
+
+
     let keyword=Object.keys(obj)
     let vals=Object.values(obj)
+
+     this.updateKeyWords=()=>{keyword.forEach((key,index)=>{ this.html(this.html().replace(new RegExp("\\{{"+key+"\\}}","gi"),vals[index]))
      
-     keyword.forEach((key,index)=>{ this.html(this.html().replace(new RegExp("\\{{"+key+"\\}}","gi"),vals[index]))
     })
-    
+    console.log('ye')
+     }
+
     return this 
     }
-  
-  
+
+
    //content placement 
    insertHtml(placement,code){ 
      this.elem.insertAdjacentHTML(placement,code) 
@@ -74,7 +105,7 @@ class finder{
      return this 
      } 
  //css styling  
-  
+
    style(prp,val=null){ 
      if(typeof prp=='string'){ 
        if(val==null){ 
@@ -92,9 +123,9 @@ class finder{
        return this 
      } 
    } 
-  
+
    //class manipulation 
-   addClass(){ 
+   class(){ 
      Array.from(arguments).forEach((c)=>{ 
        this.elem.classList.add(c) 
      }) 
@@ -118,8 +149,8 @@ class finder{
    getClass(index = 0) { 
      return this.elem.classList.item(index) 
    } 
-  
-  
+
+
    //attribute manipulation 
    attr(prp,val=null){ 
      if(typeof prp=='string'){ 
@@ -158,7 +189,7 @@ class finder{
      } 
      return this 
    } 
-  
+
    //value and input methods 
    value(val=null){ 
      if(val==null){ 
@@ -167,9 +198,10 @@ class finder{
        this.elem.value=val 
      } 
    } 
-  
+   
+
    //events manipulation 
-   checkFor(e,cb,bub){ 
+   checkFor(e,cb,bub){
      this.elem.addEventListener(e,cb,bub) 
      return this 
    } 
@@ -179,7 +211,7 @@ class finder{
    } 
    causeEvent(ev) { 
      this.elem.dispatchEvent(ev) 
-  
+
      return this 
    }
   onClick(cb){
@@ -192,16 +224,16 @@ class finder{
     this.isHolding=false
     const element=this
     function handleDOWN(e){
-      
+
       this.isHolding=true
       this.timeout=setTimeout((e)=>{
-        
+
         if(this.isHolding){
-          
+
         element.causeEvent(new CustomEvent('hold',{details:e}))
         }
       },holdtime*1000)
-    
+
     }
     function handleUP(e){
       this.isHolding=false
@@ -213,7 +245,7 @@ class finder{
     this.checkFor('touchend',handleUP)
     return this
   }
-  
+
   enableSwipe(swipeDistance=50){
     this.isSwiping=false
     let sx,sy,ex,ey;
@@ -258,7 +290,7 @@ class finder{
     }
 
     if ( distance >= swipeDistanc) {
-      
+
       const swipeEvent = new CustomEvent('swipe', { direction: actualDirection ,distance:distance});
       element.dispatchEvent(swipeEvent);
     }
@@ -273,22 +305,22 @@ class finder{
 
   }
   return this
-  
+
   }
-   
-  
+
+
    //dom manipulation{this} 
-  
+
    addTo(elm){ 
      if(elm.finderElem){ 
        elm.addChild(this) 
      }else{ 
        elm.appendChild(this.elem) 
      } 
-  
+
      return this 
    } 
-  
+
    insertTo(olb,placement){ 
           if(olb!=null){ 
          if(olb.finderElem){ 
@@ -297,13 +329,18 @@ class finder{
              olb.insertAdjacentElement(placement,this.elem) 
          } 
      }} 
-  
+
    remove(){ 
      this.elem.remove() 
      return this 
    } 
-  
-   //child manipulation 
+
+   _el(el,t='',o={}){
+     return this.create(el).text(t).attr(o)
+     
+   }
+   
+   
   create(el){
     this.addedChild=create(el)
     this.addChild(this.addedChild)
@@ -311,15 +348,15 @@ class finder{
   }
    addChild(){ 
      Array.from(arguments).forEach((child)=>{ 
-  
+
        if(child.finderElem){ 
          this.elem.appendChild(child.elem) 
        }else{ 
          this.elem.appendChild(child) 
        } 
-  
+
      }) 
-  
+
      return this 
    } 
    insertChild(placement, nod) { 
@@ -332,59 +369,63 @@ class finder{
      }) 
        return this 
    } 
-  
+
    replaceChild(child, nod) { 
      this.elem.replaceChild(nod, child) 
-  
+
      return this 
    } 
-  
+
    getChild(t) { 
-  
-     return new finder(this.elem.querySelector(t)) 
+
+     return new DominityElement(this.elem.querySelector(t)) 
    } 
    getChildren(q) { 
-     return Array.from(this.elem.querySelectorAll(q)).map(x => new finder(x)) 
+     return Array.from(this.elem.querySelectorAll(q)).map(x => new DominityElement(x)) 
    } 
-  
+
    child(pos){ 
-     return new finder(this.elem.children[pos]) 
+     return new DominityElement(this.elem.children[pos]) 
    } 
-  
+
    parent() { 
-     return new finder(this.elem.parentNode) 
-  
-   }   
-  
+     return new DominityElement(this.elem.parentNode) 
+
+   }
+   $pa(){
+     return this.parent()
+   }
+   
+
    next(){ 
-       return new finder(this.elem.nextElementSibling) 
+       return new DominityElement(this.elem.nextElementSibling) 
    } 
-  
+
    previous (){ 
-       return new finder(this.elem.previousElementSibling) 
+       return new DominityElement(this.elem.previousElementSibling) 
    } 
-  
+
   clone(condition = true) {
-    return new finder(this.elem.cloneNode(condition))
+    return new DominityElement(this.elem.cloneNode(condition))
   }
   cloneContent(condition=true){
-    return new finder(this.elem.content.cloneNode(condition))
+    return new DominityElement(this.elem.content.cloneNode(condition))
   }
-  
-  
+
+
   closest(q){ 
-     return new finder(this.elem.closest(q))    
+     return new DominityElement(this.elem.closest(q))    
   } 
-  
+
   contains(nod){ 
     if(nod.finderElem){ 
     return this.elem.contains(nod.elem) 
     }else{ 
          return this.elem.contains(nod) 
-  
+
     } 
   } 
-  
+
   matches(q){ 
     if(typeof q=='string'){ 
       return this.elem.matches(q) 
@@ -396,7 +437,7 @@ class finder{
       } 
     } 
   } 
-  
+
   //appearance 
   hide() { 
     this.style("display", "none"); 
@@ -410,18 +451,18 @@ class finder{
     if (this.style("display") == "none") { 
       this.show() 
       if (ondisp != undefined) { 
-        ondisp(new finder(this.elem)) 
+        ondisp(new DominityElement(this.elem)) 
       } 
     } else if (this.style("display") != "none") { 
       this.hide() 
       if (onhide != undefined) { 
-        onhide(new finder(this.elem)) 
+        onhide(new DominityElement(this.elem)) 
       } 
     } 
-  
+
     return this 
   } 
-  
+
   //actions
   focus(val = true) { 
     if (val == true) { 
@@ -431,18 +472,18 @@ class finder{
     } 
     return this 
   } 
-  
+
   click(){ 
     this.elem.click() 
-  
+
     return this 
   } 
-  
+
   scrollTo(s = true) { 
     this.elem.scrollIntoView(s) 
     return this 
   } 
-  
+
   getScrollInfo(){ 
     return { 
       height:this.elem.scrollHeight, 
@@ -451,12 +492,12 @@ class finder{
       y:this.elem.scrollTop 
     } 
   } 
-  
-  
+
+
   getSizeInfo(){ 
     return this.elem.getBoundingClientRect() 
   } 
-  
+
   fullScreen(val = true) { 
     if (val == true) { 
       if (this.elem.requestFullScreen) { this.elem.requestFullScreen() } 
@@ -465,7 +506,7 @@ class finder{
       } else if (this.elem.msRequestFullScreen) { 
         this.elem.msRequestFullscreen() 
       } 
-  
+
     } else { 
       if (this.elem.exitFullScreen) { this.elem.exitFullScreen() } 
       else if (this.elem.webkitExitFullscreen) { 
@@ -474,121 +515,168 @@ class finder{
         this.elem.msExitFullscreen() 
       } 
     } 
-  
+
     return this 
   } 
-  
-  
+
+
  } 
-  
-  
+
+
  class finderAll{ 
      constructor(qry){ 
         this.elemArr=[] 
          document.querySelectorAll(qry).forEach((e)=>{ 
-             this.elemArr.push(new finder(e)) 
+             this.elemArr.push(new DominityElement(e)) 
          }) 
-  
+
          return this.elemArr 
      } 
  } 
-  
-  
+
+
  //fuctions-------------------------  
-  
+
  //wait 
-  
+
  function timer(func=()=>{},ts=1){ 
         setTimeout(func,ts*1000) 
  } 
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
  //make elem 
  function create(eli,app=true,target=document.body) { 
      this.element=document.createElement(eli) 
      if(app){ 
      target.appendChild(this.element) 
      } 
-     return new finder(this.element) 
+     return new DominityElement(this.element) 
  } 
-  
-  
+//el
+function el(typ,txt='',attrs={}){
+  if(typeof txt!=Object){
+  return create(typ).text(txt).attr(attrs)
+  }else{
+    return create(typ).addChild(txt).attr(attrs)
+  }
+}
+
+//find 
+function $el(qry){
+  return new DominityElement(qry)
+}
+function $$el(qry){
+  return new finderAll(qry)
+}
+
+
  //classmaker 
  function injectCss(css){ 
      create("style").html(css) 
  } 
-  
-  
+
+
  //repeat 
-  
+
  function repeat(cd,limit,jump=1,ti=0.07) { 
      this.cnt=1 
      this.cntrl="this.cnt+="+jump 
      this.code="()=>{"+cd+";if(this.cnt>="+limit+"){clearInterval(this.inter)}else{"+this.cntrl+"}}" 
      this.inter=setInterval(eval(this.code),ti*1000); 
  } 
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
  //range 
  function range(s,e,ingrement=1){ 
      let nums=[] 
-  
-  
+
+
      if(typeof s=="string" && typeof e=="string"){ 
-  
+
      for(i=s.charCodeAt(0)-96;i<e.charCodeAt(0)-96+1;i+=ingrement){ 
          nums.push(i) 
      } 
          return nums.map((c)=>{ 
              return  String.fromCharCode(96+c) 
          }) 
-  
-  
+
+
      }else if(typeof s=="number" && typeof e=="number"){ 
      for(i=s;i<e+1;i+=ingrement){ 
          nums.push(i) 
      } 
-  
+
      return nums 
      } 
  } 
-  
-  
-  
+
+
+
  //random 
-  
+
  function random(end,start=0){ 
      if(Array.isArray(end)){ 
          return end[Math.floor(Math.random()*(end.length-start))+start] 
      }else{ 
          return Math.floor(Math.random()*(end-start))+start 
-  
+
      } 
-  
+
  } 
-  
-  
-  
-  
+
+
+
+
  //copy function 
  function copy(txt){ 
                      let input=create("input"); 
-  
-  
+
+
                  input.val(txt) 
-                 input.org.select(); 
-                 input.org.setSelectionRange(0, 99999);  
+                 input.elem.select(); 
+                 input.elem.setSelectionRange(0, 99999);  
                  document.execCommand("copy"); 
                  input.remove()           
  } 
- 
+
+//singnal
+
+class reactive{
+  constructor(value){
+    this.value=value
+    this.subscribers=[]
+    this.name=''
+  }
+  as(na){
+    this.name=na
+    return this
+  }
+  subscribe(callback){
+    this.subscribers.push(callback)
+  }
+  set(newval){
+    this.value=newval
+    this.update()
+  }
+  update(){
+    this.subscribers.forEach(callback=>{
+      callback(this)
+    })
+    
+  }
+  
+}
+
+function reactable(ini){
+  return new reactive(ini)
+}
