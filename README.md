@@ -16,7 +16,7 @@ u can easily add dominity to your HTML file using a script tag
 
 ```html
 
-<script src="https://cdn.jsdelivr.net/gh/atoms19/src/dominityV6.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/atoms19/src/DOMINITY.js"></script>
 ```
 its minified size is tiny and wont impact your performance at all unlike other bulky frameworks 
 
