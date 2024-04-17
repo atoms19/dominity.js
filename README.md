@@ -39,36 +39,57 @@ You'll be making all elements using dominity's `el()` function
 
 `el(typ, txt = '', attrs = {})`: creates an element and attaches it to the body,
 - 1st argument specifies the tagname
-- 2nd argument text of the
+- 2nd argument text, its option it can be left as blank string '' 
+- 3rd is argument accepts an object which takes in attributes of the tag as key value pairs
 
+youllbe making child nodes by chaining `._el()` which takes the same set of formal argumants
+any opened tag can be optionally closed by chaining `.$end()` 
+
+see more on syntax section
+
+#### html + js style
+
+in this style of programming with Dominity you'll be using your HTML file and make a web page traditionally. you'll use dominity functions when you need to bring interactivity or reactivity to the element 
+here Dominity operates similiar to JQuery a popular js library
 
 - `$el(qry)`: Finds and returns a dominity DOM element matching the specified query.
+
 - `$$el(qry)`: Finds and returns an array of dominity DOM elements matching the specified query.
+
 
 dominity DOM elemnts are are objects that have special methods and props to make it easy to style ,add events ,change attributes etc list of all methods are given as a table in the end of documentation
 
+Dominity DOM elements support chaining for all methods except for those meant to retrive data
+Dominity DOM elements are capable of being stored in a variable like any other object
+
 
 #### Simplified Componentization
-Dominity simplifies componentization by encapsulating DOM manipulation functions within reusable functions, effectively acting as components. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component props.
 
+Dominity allows us to create componets with ease by encapsulating Dominity code in a function. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component prop
+
+a simple button component 
 ```js
-function Counter() {
-  let count = reactable(0).as('count');
 
-  el('div').
-    _el('p', "count: {{count}}").$end().
-    _el('button', "increment").onClick(() => {
-      count.set(count.value + 1);
-    }).$end().
-    _el('button', 'decrement').onClick(() => {
-      count.set(count.value - 1);
-    }).
-    $end().
-    reactTo(count);
+function Button(text,color='red'){
+return el('button',text).style({
+backgroundColor:color
+})
+//returning to allow further chaining
 }
+
+//addTo() is used to add the component where u want
+
+Button('click me','blue').addTo($el('#h')).onClick((s)=>{
+s.style({
+backgroundColor:'red'
+   })
+})
+//here button changes color when u click it
+
 ```
 
 #### Chaining DOM Elements
+
 Dominity enables chaining of DOM elements using `_el()` and `$end()` methods, allowing developers to efficiently construct complex DOM structures in a concise and readable manner.
 
 ```js
@@ -100,23 +121,60 @@ in Dominity unlike HTML its not mandatory to close the tag at all if u dont want
 technically when u chain `$end()` its returning the parent instance back to u so u can continue working on the parent again 
 so in above example last three `$end()` chain can be entirely omitted and it will still work
 
-#### Reactivity Support
-Dominity simplifies reactivity management by providing `reactable().as('')`, `reactTo()`, and `set` methods, leveraging a publish-subscribe model for efficient state management. Developers can easily define reactive states and update DOM elements accordingly.
+#### Reactivity System
+
+Dominity has a unique reactive system which isn't complex ir capable as the ones in other ones but its a neat way to make your dominity elements react to data
+
 
 ```js
-let count = reactable(0).as('count');
-count.subscribe((state) => {
-  console.log(`Count: ${state.value}`);
-});
-count.set(10);
+let opinion = reactable('good').as('op');
+
+el("h1","you are so {{op}}").reactTo(opinion)
+
 ```
 
-### Utility Functions
-Dominity offers utility functions for common tasks, including copying text and generating random values.
+function `reactable()` is used to create any litteral that is reactive it can be a integer,float,string,an object an array whats so ever ,it returns an object whixh stores the actual value in the `.value`
+property , you have to chain `.as()` to this to set up the name you'll be using in the text of elems
 
-- `copy(txt)`: Copies the specified text to the clipboard.
-- `random(end, start = 0)`: Generates a random value within the specified range.
-- `range(s, e, increment = 1)`: Generates an array of numbers within the specified range.
+in elements text string you can use double moustaches to surround the name u gave to reactable with `as()` and make that element attached to the reactable by using `reactTo(<reactableobject>)` pass in reactable stored in variable
+
+it carries over to child element if its on parent element as well
+
+in the above example whenever we change the value of opinion by using `.set()` method its change is reflected on the h1 tag
+
+```js
+opinion.set('bad')
+```
+
+given below is an example of a simple counter using dominity
+
+```js
+function Counter() {
+  let count = reactable(0).as('count');
+
+  el('div').
+    _el('p', "count: {{count}}").$end().
+    _el('button', "increment").onClick(() => {
+      count.set(count.value + 1);
+    }).$end().
+    _el('button', 'decrement').onClick(() => {
+      count.set(count.value - 1);
+    }).
+    $end().
+    reactTo(count);
+}
+```
+
+
+
+### Utility Functions
+Dominity offers a few utility functions for common tasks, including copying text and generating random values.
+
+- `copy(txt)`: Copies the specified text to the clipboard of user 
+
+- `random(end, start = 0)`: Generates a random value within the specified range, it can also take just an array as argument and it will automatically chose a random element from that array
+
+- `range(s, e, increment = 1)`: Generates an array of numbers within the specified range. it can also generate an array of alphabets 
 
 ```js
 copy("Hello, world!");
@@ -182,7 +240,8 @@ methods included:
 | `getSizeInfo()`         | Gets information about the element's size and position.                                          |
 | `fullScreen(val = true)`| Enters or exits full-screen mode.                                                               |
 | `onClick(cb)`           | Sets up an event listener for the "click" event.                                                 |
-| `enableHold(holdtime=0.5)` | Enables holding event on the element.                                                         |
-| `enableSwipe(swipeDistance=50)` | Enables swipe event on the element.                                                         |
+| `enableHold(holdtime=0.5)` | Enables holding event on the element,you'll have to listen to this using checkFor.                                                         |
+| `enableSwipe(swipeDistance=50)` | Enables swipe event on the element, use checkFor same as above.                                                         |
 
 > you can still access orginal elements methods and props by using `<dominityElem>.elem.<orginal method>()`
+
