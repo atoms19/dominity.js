@@ -39,7 +39,7 @@ function Counter() {
 Dominity enables chaining of DOM elements using `_el()` and `$pa()` methods, allowing developers to efficiently construct complex DOM structures in a concise and readable manner.
 
 ```js
-el('div')._el('p', "Paragraph 1").$pa()._el('p', "Paragraph 2").$end();
+el('div')._el('p', "Paragraph 1").$end()._el('p', "Paragraph 2").$end();
 ```
 
 #### Reactivity Support
