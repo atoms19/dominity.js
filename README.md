@@ -4,10 +4,7 @@
 
 Dominity is a simple JavaScript library designed to help u write HTML like syntax in javascript  which makes logic integration and componentation way easier
 
-it also has bunch of methods to do traditional tasks u do with js like removing an attribute or toggling a class firing an event etc faster and smoother
-
 it even has reactive states allowing you to automatically update the elements contents when the state changes
-making webdev carefree
  
 #### target audience 
 Dominity is made for small scale projects but there's no one stopping you from using it on your big projects  
