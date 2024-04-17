@@ -36,11 +36,18 @@ function Counter() {
 ```
 
 #### Chaining DOM Elements
-Dominity enables chaining of DOM elements using `_el()` and `$pa()` methods, allowing developers to efficiently construct complex DOM structures in a concise and readable manner.
+Dominity enables chaining of DOM elements using `_el()` and `$end()` methods, allowing developers to efficiently construct complex DOM structures in a concise and readable manner.
 
 ```js
 el('div')._el('p', "Paragraph 1").$end()._el('p', "Paragraph 2").$end();
 ```
+once use  the `el()` or `$el()` you are allowed to chain methods to it n number of times , think of it as opening an HTML tag.
+when u chain the `.$end()` it closes the tag according to analogy as long as u dont close it u can chain methods to modify, add events or style whatever u can create a child elemnt by chainig `._el()` which is same as `el()` but syntactically nicer we recommend using intendation to make it look nice like we did in the counter example above now that you've openeda child tag using `._el()` now methods u chain to it will work on the child to go back to working with parent close the child by chainig `$end()`
+
+in Dominity unlike HTML its not mandatory to close the tag at all if u dont want to go back to working with the parent element 
+
+technically when u chain `$end()` its returning the parent instance back to u so u can continue working on the parent again 
+
 
 #### Reactivity Support
 Dominity simplifies reactivity management by providing `reactable().as('')`, `reactTo()`, and `set` methods, leveraging a publish-subscribe model for efficient state management. Developers can easily define reactive states and update DOM elements accordingly.
