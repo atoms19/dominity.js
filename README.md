@@ -166,6 +166,79 @@ function Counter() {
 ```
 
 
+reactables can be derived from other reactables which allows one to depend on others value
+```js
+
+let name=reactable('vishal')
+
+let nameAsList=reactable().deriveFrom(name,(value)=>{
+return Array.from(value)
+})
+
+```
+each time name updates its derived one will also update 
+
+### examples
+
+#### a simple dropdown
+
+```js
+function Dropdown(op=false){
+  let open=reactable(op)
+  
+  return el('div').
+    _el('button','dropdown button').onClick(()=>{
+     open.set(!open.value)
+    })
+    .$end().
+    _el('div','some very respectable dropdown content').showIf(open)
+  
+ 
+}
+```
+
+`showIf()` only renders the element if the reactable passed into it is truthy
+it hides otherwise
+
+it can also take in a condition but it wont be dynamic unless it is a reactable 
+
+#### filtered searchbar
+
+```js
+function filterSearch(){
+  let search=reactable('')
+  let items=["potatoes","chicken","rice","bread"]
+  
+  let filteredItems=reactable().deriveFrom(search,(val)=>{
+    return items.filter(i=>i.startsWith(val))
+  })
+
+  return el('div').
+    _el('input','',{
+      placeHolder:'search in filter'
+      ,type:'search'
+    }).modal(search)
+    .$end().
+    _el('ul').loops(filteredItems,(item,parent)=>{
+        parent.
+          _el('li',item)
+      }).$end()
+  
+}
+
+```
+the above example uses a derived reactable using`.deriveFrom()` method of a reactable
+to get a filtered list each time search value updates
+
+an interesting method of dominity search element is `.modal()` which allows you to actively update a reactable whenever its value changes and vice versa 
+
+here you can see the derived reactable filtered items is rendered as a list this is done by using `.loops()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and also the parent element for adding child elements
+
+
+
+
+
+
 
 ### Utility Functions
 Dominity offers a few utility functions for common tasks, including copying text and generating random values.
