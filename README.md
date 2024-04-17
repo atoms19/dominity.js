@@ -6,10 +6,10 @@ Dominity is a simple JavaScript library designed to help u write HTML like synta
 
 it even has reactive states allowing you to automatically update the elements contents when the state changes
  
-#### target audience 
-Dominity is made for small scale projects but there's no one stopping you from using it on your big projects  
+#### usability 
 
 Dominity doesn't have to replace HTML at all ,u can use it with HTML to add interactability and reactivity easily with less hassle 
+
 
 ### usage
 u can easily add dominity to your HTML file using a script tag
