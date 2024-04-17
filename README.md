@@ -1,14 +1,47 @@
 ## Dominity js
 
 ### Introduction
-Dominity is a concise JavaScript library designed to streamline HTML and JavaScript integration, focusing on simplifying DOM manipulation and componentization. It offers intuitive methods and utilities for efficiently building interactive web applications.
 
-### Features
+Dominity is a simple JavaScript library designed to help u write HTML like syntax in javascript  which makes logic integration and componentation way easier
 
-#### Bringing HTML to JavaScript
-Dominity facilitates seamless interaction between HTML and JavaScript through its `el()`, `$el()`, and `$$el()` functions. These functions allow developers to effortlessly create, manipulate, and query DOM elements within JavaScript code.
+it also has bunch of methods to do traditional tasks u do with js like removing an attribute or toggling a class firing an event etc faster and smoother
 
-- `el(typ, txt = '', attrs = {})`: Creates a DOM element of the specified type with optional text content and attributes.
+it even has reactive states allowing you to automatically update the elements contents when the state changes
+making webdev carefree
+ 
+#### target audience 
+Dominity is made for small scale projects but there's no one stopping you from using it on your big projects  
+
+Dominity doesn't have to replace HTML at all ,u can use it with HTML to add interactability and reactivity easily with less hassle 
+
+### usage
+u can easily add dominity to your HTML file using a script tag
+
+```html
+
+<script src="https://cdn.jsdelivr.net/gh/atoms19/src/dominityV6.min.js"></script>
+```
+its minified size is tiny and wont impact your performance at all unlike other bulky frameworks 
+
+
+### basics
+
+there are 2 styles to use Dominity
+
+1) pure js style
+2) html+js style
+
+
+#### pure js style
+ In this style of programming you'll not be touching the HTML file after u placed the `dominity.js` script tag in your head 
+
+You'll be making all elements using dominity's `el()` function
+
+`el(typ, txt = '', attrs = {})`: creates an element and attaches it to the body,
+- 1st argument specifies the tagname
+- 2nd argument text of the
+
+
 - `$el(qry)`: Finds and returns a dominity DOM element matching the specified query.
 - `$$el(qry)`: Finds and returns an array of dominity DOM elements matching the specified query.
 
