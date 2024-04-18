@@ -32,13 +32,13 @@ class DominityElement{
    //reactive states
    reactTo(...s){
      
-     let template=this.html()
+    let template=this.html()
      
-    s.forEach((r)=>{
-      
+      s.forEach((r)=>{
      r.subscribe((t)=>{
        if(typeof t.value!='object'){
       this.text(template.replace(new RegExp('{{'+r.name+'}}','gi'),t.value))
+     
        }else{
          
          Object.keys(t.value).forEach((k)=>{
@@ -49,7 +49,7 @@ class DominityElement{
       
      })
      r.update()
-    })
+      })
    
     return this
    }
@@ -211,6 +211,13 @@ class DominityElement{
       cb(this,e)
     })
     return this
+  }
+  onClickOut(cb){
+    document.addEventListener('click',(e)=>{
+      if(e.target!==this.elem){
+        
+      }
+    })
   }
   enableHold(holdtime=0.5){
     this.isHolding=false
@@ -454,7 +461,9 @@ class DominityElement{
 
     return this 
   }
-  //reactive functions
+
+  
+  
   showIf(bool){
     let elemS=this
     if(bool instanceof reactive){
@@ -493,22 +502,40 @@ class DominityElement{
   }
   
   modal(target){
-    let linkValue=(data)=>{
-      
-      this.attr('value',data.value)
-      
-    }
+    
+    
     if(target instanceof reactive){
-      target.subscribe(linkValue)
+      target.subscribe((d)=>{
+        this.attr('value',d.value)
+      })
       target.update()
+      
+          this.checkFor('input', () => {
+      let val=this.value()
+        if(this.attr('type')=='number'){
+         if(val==''){
+           val='0'
+         }
+          val=parseFloat(val)
+          
+        }
+            target.set(val)
+            
+            
+          })
+    }else{
+      this.attr('value',target)
+    this.checkFor('input',()=>{
+     
+      target=(this.value())
+    })
     }
     
-    this.checkFor('input',()=>{
-      target.set(this.value())
-    })
+    
     
     return this
   }
+  
   
 
   //actions
@@ -714,7 +741,7 @@ class reactive{
   }
   setProp(prop,val){
     this.value[prop]=val
-    update()
+    this.update()
   }
   deriveFrom(reaction,callback){
     if(reaction instanceof reactive){
