@@ -252,7 +252,7 @@ el('form')
   .$end().
   checkFor('submit',(e)=>{
     e.preventDefault()
-    if(taskname!=''){
+    if(taskname.value !=''){
       tasks.value.push({
         name:taskname.get(),
         done:false
