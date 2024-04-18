@@ -294,6 +294,14 @@ tasks.subscribe(()=>{
  localStorage.tasks=JSON.stringify(tasks.value)
  
 })
+
+/*optional link to styleing cause it actually looks horrible without styling*/
+el('link','',{
+  href:'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css'
+  ,rel:'stylesheet'
+})
+
+
 ```
 normally to make something like this it takes a lot of time and thinking but in dominity its all very simple `.subscribe()` method allows u to call a function when desired reactable is changed 
 
