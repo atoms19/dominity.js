@@ -15,9 +15,9 @@ class DominityElement{
      this.childCount=this.elem.childElementCount 
      this.tag=this.elem.tagName
 
-    
+
    } 
-   
+
 
    //content updation 
    text(val=null){ 
@@ -28,32 +28,32 @@ class DominityElement{
        return this 
      } 
    }
-   
+
    //reactive states
    reactTo(...s){
-     
+
     let template=this.html()
-     
+
       s.forEach((r)=>{
      r.subscribe((t)=>{
        if(typeof t.value!='object'){
       this.text(template.replace(new RegExp('{{'+r.name+'}}','gi'),t.value))
-     
+
        }else{
-         
+
          Object.keys(t.value).forEach((k)=>{
            this.html(template.replace(new RegExp('{{'+r.name+'.'+k+'}}','gi'),t.value[k]))
            template=this.html()
          })
        }
-      
+
      })
      r.update()
       })
-   
+
     return this
    }
-   
+
    html(val=null){ 
      if(val==null){ 
        return this.elem.innerHTML 
@@ -62,7 +62,7 @@ class DominityElement{
        return this 
      } 
    } 
-   
+
    code(val=null){ 
      if(val==null){ 
        return this.elem.outerHTML 
@@ -85,7 +85,7 @@ class DominityElement{
      this.elem.outerHTML+=val 
      return this 
    } 
-  
+
 
    //content placement 
    insertHtml(placement,code){ 
@@ -190,7 +190,7 @@ class DominityElement{
        this.elem.value=val 
      } 
    } 
-   
+
 
    //events manipulation 
    checkFor(e,cb,bub){
@@ -215,7 +215,7 @@ class DominityElement{
   onClickOut(cb){
     document.addEventListener('click',(e)=>{
       if(e.target!==this.elem){
-        
+
       }
     })
   }
@@ -334,12 +334,16 @@ class DominityElement{
      return this 
    } 
 
-   _el(el,t='',o={}){
-     return this.create(el).text(t).attr(o)
-     
+   _el(typ,txt='',attrs={}){
+     if(typeof txt=='object'){
+     return this.create(typ).attr(txt)
+     }else{
+       return this.create(typ).text(txt).attr(attrs)
+     }
+
    }
-   
-   
+
+
   create(el){
     this.addedChild=create(el)
     this.addChild(this.addedChild)
@@ -394,7 +398,7 @@ class DominityElement{
    $end(){
      return this.parent()
    }
-   
+
 
    next(){ 
        return new DominityElement(this.elem.nextElementSibling) 
@@ -462,8 +466,8 @@ class DominityElement{
     return this 
   }
 
-  
-  
+
+
   showIf(bool){
     let elemS=this
     if(bool instanceof reactive){
@@ -472,7 +476,7 @@ class DominityElement{
         elemS.showIf(data.value)
       })
       bool.update()
-      
+
       return this
     }
 
@@ -482,9 +486,9 @@ class DominityElement{
       this.hide()
     }
     return this
-    
+
   }
-  
+
   loops(list,callback){
     let elemS=this
     if(list instanceof reactive){
@@ -500,16 +504,16 @@ class DominityElement{
     console.error('DominityError: list item for ._elFor has to be a reactive object made with reactable(')
     return this
   }
-  
+
   modal(target){
-    
-    
+
+
     if(target instanceof reactive){
       target.subscribe((d)=>{
         this.attr('value',d.value)
       })
       target.update()
-      
+
           this.checkFor('input', () => {
       let val=this.value()
         if(this.attr('type')=='number'){
@@ -517,26 +521,26 @@ class DominityElement{
            val='0'
          }
           val=parseFloat(val)
-          
+
         }
             target.set(val)
-            
-            
+
+
           })
     }else{
       this.attr('value',target)
     this.checkFor('input',()=>{
-     
+
       target=(this.value())
     })
     }
-    
-    
-    
+
+
+
     return this
   }
-  
-  
+
+
 
   //actions
   focus(val = true) { 
@@ -608,10 +612,10 @@ class DominityElement{
          return this.elemArr 
      } 
  }
- 
- 
 
- 
+
+
+
 
 
  //fuctions-------------------------
@@ -627,10 +631,10 @@ class DominityElement{
  } 
 //el
 function el(typ,txt='',attrs={}){
-  if(typeof txt!=Object){
-  return create(typ).text(txt).attr(attrs)
+  if(typeof txt=='object'){
+  return create(typ).attr(txt)
   }else{
-    return create(typ).addChild(txt).attr(attrs)
+    return create(typ).text(txt).attr(attrs)
   }
 }
 
@@ -716,7 +720,7 @@ class reactive{
     this.value=value
     this.subscribers=[]
     this.name=''
-    
+
   }
   as(na){
     this.name=na
@@ -751,20 +755,18 @@ class reactive{
       reaction.update()
       return this
     }
-    
+
   }
-  
+
   update(){
     this.subscribers.forEach(callback=>{
       callback(this)
     })
-    
+
   }
-  
+
 }
 
 function reactable(ini){
   return new reactive(ini)
 }
-
-
