@@ -199,7 +199,7 @@ it hides otherwise
 
 it can also take in a condition but it wont be dynamic unless it is a reactable 
 
-#### filtered searchbar
+#### filtering searchbar
 
 ```js
 function filterSearch(){
@@ -232,8 +232,70 @@ an interesting method of dominity search element is `.modal()` which allows you 
 here you can see the derived reactable filtered items is rendered as a list this is done by using `.loops()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and also the parent element for adding child elements
 
 
+### fully functional tasks app
 
+```js
+let taskname=reactable('')
+let tasks=reactable(JSON.parse(localStorage.tasks))
+el('form')
+  ._el('fieldset','',{
+    role:'group'
+  }).
+    _el('input','',{
+      type:'text'
+      ,placeHolder:'enter task'
+      ,id:'infield'
+    }).modal(taskname).$end().
+    _el('input','add task',{
+      type:'submit'
+    }).$end()
+  .$end().
+  checkFor('submit',(e)=>{
+    e.preventDefault()
+    if(taskname!=''){
+      tasks.value.push({
+        name:taskname.get(),
+        done:false
+      })
+      tasks.update()
+      $el('#infield').value('')
+      
+    }
+  })
+  
+el('ul').loops(tasks,(obj,p)=>{
+  p.
+    _el('li').
+      _el('input','',{
+        type:'checkbox',
+       
+      }).attr(obj.done?('checked'):'unchecked','').checkFor('input',()=>{
+        obj.done=!obj.done
+        tasks.setProp('done',obj.done)
+        
+      })
+      
+      .$end().
+      _el('span',obj.name).style({
+        marginRight:'2rem',
+        textDecoration:obj.done?'line-through':'none'
+      }).$end().
+      _el('button','x').class('outline').onClick((s)=>{
+ tasks.set(tasks.value.filter(ob=>{
+   return ob!=obj
+ }))
 
+      })
+    
+})
+  
+tasks.subscribe(()=>{
+   
+ localStorage.tasks=JSON.stringify(tasks.value)
+ 
+})
+```
+normally to make something like this it takes a lot of time and thinking but in dominity its all very simple `.subscribe()` method allows u to call a function when desired reactable is changed 
 
 
 
