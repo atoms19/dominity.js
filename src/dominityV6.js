@@ -6,14 +6,18 @@ class DominityElement{
      }else{ 
        this.elem=qry 
      } 
+     if(this.elem==null){
+       console.error(`DominityError: element of query '${qry}'  NOT  FOUND `)
+       return
+     }
      //properties goes here 
-     this.finderElem=true 
+     this.dominityElem=true 
      this.childCount=this.elem.childElementCount 
      this.tag=this.elem.tagName
 
-    
+
    } 
-   
+
 
    //content updation 
    text(val=null){ 
@@ -24,30 +28,32 @@ class DominityElement{
        return this 
      } 
    }
-   
+
    //reactive states
    reactTo(...s){
-     
-     let template=this.html()
-    s.forEach((r)=>{
+
+    let template=this.html()
+
+      s.forEach((r)=>{
      r.subscribe((t)=>{
        if(typeof t.value!='object'){
       this.text(template.replace(new RegExp('{{'+r.name+'}}','gi'),t.value))
+
        }else{
-         
+
          Object.keys(t.value).forEach((k)=>{
            this.html(template.replace(new RegExp('{{'+r.name+'.'+k+'}}','gi'),t.value[k]))
            template=this.html()
          })
        }
-      
+
      })
      r.update()
-    })
-   
+      })
+
     return this
    }
-   
+
    html(val=null){ 
      if(val==null){ 
        return this.elem.innerHTML 
@@ -56,7 +62,7 @@ class DominityElement{
        return this 
      } 
    } 
-   
+
    code(val=null){ 
      if(val==null){ 
        return this.elem.outerHTML 
@@ -79,20 +85,6 @@ class DominityElement{
      this.elem.outerHTML+=val 
      return this 
    } 
-  keyWords(obj){
-
-
-    let keyword=Object.keys(obj)
-    let vals=Object.values(obj)
-
-     this.updateKeyWords=()=>{keyword.forEach((key,index)=>{ this.html(this.html().replace(new RegExp("\\{{"+key+"\\}}","gi"),vals[index]))
-     
-    })
-    console.log('ye')
-     }
-
-    return this 
-    }
 
 
    //content placement 
@@ -198,7 +190,7 @@ class DominityElement{
        this.elem.value=val 
      } 
    } 
-   
+
 
    //events manipulation 
    checkFor(e,cb,bub){
@@ -219,6 +211,13 @@ class DominityElement{
       cb(this,e)
     })
     return this
+  }
+  onClickOut(cb){
+    document.addEventListener('click',(e)=>{
+      if(e.target!==this.elem){
+
+      }
+    })
   }
   enableHold(holdtime=0.5){
     this.isHolding=false
@@ -312,7 +311,7 @@ class DominityElement{
    //dom manipulation{this} 
 
    addTo(elm){ 
-     if(elm.finderElem){ 
+     if(elm.dominityElem){ 
        elm.addChild(this) 
      }else{ 
        elm.appendChild(this.elem) 
@@ -323,7 +322,7 @@ class DominityElement{
 
    insertTo(olb,placement){ 
           if(olb!=null){ 
-         if(olb.finderElem){ 
+         if(olb.dominityElem){ 
              olb.insertChild(placement,this.elem) 
          }else{ 
              olb.insertAdjacentElement(placement,this.elem) 
@@ -335,12 +334,16 @@ class DominityElement{
      return this 
    } 
 
-   _el(el,t='',o={}){
-     return this.create(el).text(t).attr(o)
-     
+   _el(typ,txt='',attrs={}){
+     if(typeof txt=='object'){
+     return this.create(typ).attr(txt)
+     }else{
+       return this.create(typ).text(txt).attr(attrs)
+     }
+
    }
-   
-   
+
+
   create(el){
     this.addedChild=create(el)
     this.addChild(this.addedChild)
@@ -349,7 +352,7 @@ class DominityElement{
    addChild(){ 
      Array.from(arguments).forEach((child)=>{ 
 
-       if(child.finderElem){ 
+       if(child.dominityElem){ 
          this.elem.appendChild(child.elem) 
        }else{ 
          this.elem.appendChild(child) 
@@ -392,10 +395,10 @@ class DominityElement{
      return new DominityElement(this.elem.parentNode) 
 
    }
-   $pa(){
+   $end(){
      return this.parent()
    }
-   
+
 
    next(){ 
        return new DominityElement(this.elem.nextElementSibling) 
@@ -418,7 +421,7 @@ class DominityElement{
   } 
 
   contains(nod){ 
-    if(nod.finderElem){ 
+    if(nod.dominityElem){ 
     return this.elem.contains(nod.elem) 
     }else{ 
          return this.elem.contains(nod) 
@@ -430,7 +433,7 @@ class DominityElement{
     if(typeof q=='string'){ 
       return this.elem.matches(q) 
     }else if(typeof q=='object'){ 
-      if(q.finderElem){ 
+      if(q.dominityElem){ 
         return q===this 
       }else{ 
         return q===this.elem 
@@ -461,7 +464,83 @@ class DominityElement{
     } 
 
     return this 
-  } 
+  }
+
+
+
+  showIf(bool){
+    let elemS=this
+    if(bool instanceof reactive){
+
+      bool.subscribe((data)=>{
+        elemS.showIf(data.value)
+      })
+      bool.update()
+
+      return this
+    }
+
+    if(bool){
+      this.show()
+    }else{
+      this.hide()
+    }
+    return this
+
+  }
+
+  loops(list,callback){
+    let elemS=this
+    if(list instanceof reactive){
+      list.subscribe((data)=>{
+        elemS.html('')
+        data.value.forEach((item,count)=>{
+          callback(item,elemS,count)
+        })
+      })
+      list.update()
+      return this
+    }
+    console.error('DominityError: list item for ._elFor has to be a reactive object made with reactable(')
+    return this
+  }
+
+  modal(target){
+
+
+    if(target instanceof reactive){
+      target.subscribe((d)=>{
+        this.attr('value',d.value)
+      })
+      target.update()
+
+          this.checkFor('input', () => {
+      let val=this.value()
+        if(this.attr('type')=='number'){
+         if(val==''){
+           val='0'
+         }
+          val=parseFloat(val)
+
+        }
+            target.set(val)
+
+
+          })
+    }else{
+      this.attr('value',target)
+    this.checkFor('input',()=>{
+
+      target=(this.value())
+    })
+    }
+
+
+
+    return this
+  }
+
+
 
   //actions
   focus(val = true) { 
@@ -532,20 +611,14 @@ class DominityElement{
 
          return this.elemArr 
      } 
- } 
-
-
- //fuctions-------------------------  
-
- //wait 
-
- function timer(func=()=>{},ts=1){ 
-        setTimeout(func,ts*1000) 
- } 
+ }
 
 
 
 
+
+
+ //fuctions-------------------------
 
 
  //make elem 
@@ -558,10 +631,10 @@ class DominityElement{
  } 
 //el
 function el(typ,txt='',attrs={}){
-  if(typeof txt!=Object){
-  return create(typ).text(txt).attr(attrs)
+  if(typeof txt=='object'){
+  return create(typ).attr(txt)
   }else{
-    return create(typ).addChild(txt).attr(attrs)
+    return create(typ).text(txt).attr(attrs)
   }
 }
 
@@ -574,10 +647,7 @@ function $$el(qry){
 }
 
 
- //classmaker 
- function injectCss(css){ 
-     create("style").html(css) 
- } 
+
 
 
  //repeat 
@@ -588,10 +658,6 @@ function $$el(qry){
      this.code="()=>{"+cd+";if(this.cnt>="+limit+"){clearInterval(this.inter)}else{"+this.cntrl+"}}" 
      this.inter=setInterval(eval(this.code),ti*1000); 
  } 
-
-
-
-
 
 
 
@@ -635,8 +701,6 @@ function $$el(qry){
  } 
 
 
-
-
  //copy function 
  function copy(txt){ 
                      let input=create("input"); 
@@ -649,13 +713,14 @@ function $$el(qry){
                  input.remove()           
  } 
 
-//singnal
+//reactable 
 
 class reactive{
   constructor(value){
     this.value=value
     this.subscribers=[]
     this.name=''
+
   }
   as(na){
     this.name=na
@@ -664,19 +729,114 @@ class reactive{
   subscribe(callback){
     this.subscribers.push(callback)
   }
+  unsubscribe(callback){
+    this.subscribers.pop(subscribers.indexOf(callback))
+  }
   set(newval){
     this.value=newval
     this.update()
   }
+  get(prop=''){
+    if(prop!=''){
+    return this.value[prop]
+    }else{
+      return this.value
+    }
+  }
+  setProp(prop,val){
+    this.value[prop]=val
+    this.update()
+  }
+  deriveFrom(reaction,callback){
+    if(reaction instanceof reactive){
+      reaction.subscribe(()=>{
+        this.set(callback(reaction.value))
+      })
+      reaction.update()
+      return this
+    }
+
+  }
+
   update(){
     this.subscribers.forEach(callback=>{
       callback(this)
     })
-    
+
   }
-  
+
 }
 
 function reactable(ini){
   return new reactive(ini)
 }
+
+//reactable is used as routekey as its value update automatically triggers the component to rerender based off its truthiness
+
+class DominityRouter{
+  constructor(){
+    this.path=this.getPath()
+    this.defaultPath=''
+    this.routes=[]
+   this.firstLoad=0
+   this.backHandler=async () => {
+     if (this.firstLoad) {
+       console.log('first key router')
+       await this.handleRoute()
+   
+     } else {
+       this.routeTo(this.defaultPath)
+       this.firstLoad = 1
+      
+     }
+   
+   }
+   
+    addEventListener('popstate',this.backHandler)
+   
+addEventListener('load',
+this.backHandler)
+  }
+  register(route,pageElement,defaultState=false,callback=()=>{}){
+    let config={
+      route: route,
+      elem: pageElement,
+      callback: callback,
+      routeKey: reactable(defaultState)
+    }
+   this.routes.push(config)
+    pageElement.showIf(config.routeKey)
+    
+  }
+  getPath(){
+    return window.location.pathname
+  }
+  
+   async handleRoute(){
+    
+
+    this.routes.forEach(routeObj=>{
+     
+      if(this.getPath()==routeObj.route){
+       routeObj.routeKey.set(true)
+      }else{
+        routeObj.routeKey.set(false)
+      }
+    })
+    console.log('routing...',this.getPath())
+
+  }
+  routeTo(route){
+    history.pushState(null,'',route)
+    console.log('routed to somewhere')
+    this.handleRoute()
+    
+    
+    
+  }
+  
+}
+
+
+
+
