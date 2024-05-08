@@ -319,7 +319,7 @@ if(!this.template){
     return this 
   } 
 
-  //value and input methods 
+  //value and input methods------------------- 
   /**
    * used to set or get value of an input element
    * @param {any} val 
@@ -334,26 +334,51 @@ if(!this.template){
   } 
 
 
-  //events manipulation 
+  //events manipulation---------------------------
+  /**
+   * checks for an event and adds an event listener
+   * @param {string} e- eventname to be checked 
+   * @param {function} cb -callback function
+   * @param {boolean} bub -event bubling 
+   * @returns {this}
+   */ 
   checkFor(e,cb,bub){
     this.elem.addEventListener(e,cb,bub) 
     return this 
-  } 
+  }
+  /**
+   * stops listening for an event
+   * @param {Event} ev -event
+   * @param {function} func -function  
+   * @param {boolean} bub -bubling
+   * @returns {this}
+   */
   stopCheckFor(ev, func, bub) { 
     this.elem.removeEventListener(ev, func, bub) 
     return this 
   } 
+  /**
+   * triggers a new event
+   * @param {any} ev -event to be dispatched
+   * @returns 
+   */
   causeEvent(ev) { 
     this.elem.dispatchEvent(ev) 
 
     return this 
   }
+  /**
+   * checks for click events
+   * @param {function} cb -call back function
+   * @returns {this}
+   */
  onClick(cb){
    this.checkFor('click',(e)=>{
      cb(this,e)
    })
    return this
  }
+//clickoutside event in development--------
  onClickOut(cb){
    document.addEventListener('click',(e)=>{
      if(e.target!==this.elem){
@@ -361,6 +386,11 @@ if(!this.template){
      }
    })
  }
+ /**
+  * enables the ability to listen for 'hold' events on the element
+  * @param {number} [holdtime] -time delay for click and hold to be triggered
+  * @returns 
+  */
  enableHold(holdtime=0.5){
    this.isHolding=false
    const element=this
@@ -387,7 +417,11 @@ if(!this.template){
    return this
  }
   //dom manipulation{this} 
-
+/**
+ * appends the element to another element provided 
+ * @param {DominityElement|HTMLELement} elm -parent element to add to
+ * @returns {this}
+ */
   addTo(elm){ 
     if(elm.dominityElem){ 
       elm.addChild(this) 
@@ -397,21 +431,38 @@ if(!this.template){
 
     return this 
   } 
-
-  insertTo(olb,placement){ 
-         if(olb!=null){ 
-        if(olb.dominityElem){ 
-            olb.insertChild(placement,this.elem) 
+/**
+ * inserts this element to another element at a certin position
+ * @param {DominityElement|HTMLELement} elm-parent element to add to
+ * @param {string} placement -positon from beforebegin,afterbegin,beforeend,afterend etc
+ * @see `insertHtml()`
+ * @returns {this}
+ */
+  insertTo(elm,placement){ 
+         if(elm!=null){ 
+        if(elm.dominityElem){ 
+            elm.insertChild(placement,this.elem) 
         }else{ 
-            olb.insertAdjacentElement(placement,this.elem) 
+            elm.insertAdjacentElement(placement,this.elem) 
         } 
     }} 
-
+/**
+ * removes the element from the DOM tree
+ * @returns {this}
+ */
   remove(){ 
     this.elem.remove() 
     return this 
   } 
-
+/**
+ * creates a child element and addes it
+ * @param {string} typ -valid html tagname of element
+ * @param {string|object} txt-text inside the child element (if element doesnt have any text u can give an object of attribute here) 
+ * @param {object} attrs -objects with attribute value pairs 
+ * @returns {DominityElement}
+ * @see -`el()`
+ * returned element is the created child so now u are working with this child to go back to working with parent chain `.$end()`
+ */
   _el(typ,txt='',attrs={}){
     
     if(typeof txt=='object'){
@@ -423,12 +474,21 @@ if(!this.template){
 
   }
 
-
+/**
+ * creates a child element 
+ * @param {*} el 
+ * @returns {DominityElement} -returned is an instance of child object to go back to working with parent chain `.$end()`
+ */
  create(el){
    this.addedChild=create(el)
    this.addChild(this.addedChild)
    return this.addedChild
  }
+ /**
+  * adds children to the element , multiple child elements can be added seperated by comma 
+  * @param {...DominityElement} 
+  * @returns {this}
+  */
   addChild(){ 
     Array.from(arguments).forEach((child)=>{ 
 
@@ -441,73 +501,133 @@ if(!this.template){
     }) 
 
     return this 
-  } 
+  }
+  /**
+  * inserts children to the element 
+  * @param {string} placement -specifies position to be placed
+  * @param {HTMLElement} nod -element to be placed
+  * @returns {this} 
+  */
   insertChild(placement, nod) { 
     this.elem.insertAdjacentElement(placement, nod) 
     return this 
-  }   
+  }
+  /**
+  * removes children to the element , multiple child elements can be removed seperated by comma 
+  * @returns {this} 
+  */   
   removeChild(){ 
     Array.from(arguments).forEach((nod)=>{ 
       this.elem.removeChild(this.elem.childNodes[nod]) 
     }) 
       return this 
   } 
-
+/**
+ * 
+ * @param {HTMLELement} child - child to be replaced
+ * @param {HTMLElement} nod - new child
+ * @returns {this}
+ */
   replaceChild(child, nod) { 
     this.elem.replaceChild(nod, child) 
 
     return this 
   } 
+/**
+ * finds a child by query 
+ * @param {string} q- query to find child
+ * @returns {DominityElement} -returns the child if found
+ */
+  getChild(q) { 
 
-  getChild(t) { 
-
-    return new DominityElement(this.elem.querySelector(t)) 
-  } 
+    return new DominityElement(this.elem.querySelector(q)) 
+  }
+  /**
+   * gets all the children that matches the query
+   * @param {string} q -query to find child 
+   * @returns {array} -returns array of dominityelements
+   */
   getChildren(q) { 
     return Array.from(this.elem.querySelectorAll(q)).map(x => new DominityElement(x)) 
   } 
-
+/**
+ * gets child of element by index
+ * @param {index} pos 
+ * @returns {DominityElement} -returns the child
+ */
   child(pos){ 
     return new DominityElement(this.elem.children[pos]) 
   } 
-
+/**
+ * @see `$end()`
+ * @returns {DominityElement} - returns the parent element
+ */
   parent() { 
     return new DominityElement(this.elem.parentNode) 
 
   }
+  //indevelopment
   firstParent(element='body'){
     let pn=''
-    while(pn!=$el(element)){
+    while(pn!=$el(element)){ 
       pn=this.elem.parentNode
 
     }
     return new DominityElement(pn)
   }
+  /**
+   * returns the parent instance
+   *
+   * @returns {DominityElement} -returns parent so u can go back to working with parent element
+   */
   $end(){
     return this.parent()
   }
 
-
+/**
+ * returns the next element in the tree
+ * @returns {DominityElement} 
+ */
   next(){ 
       return new DominityElement(this.elem.nextElementSibling) 
   } 
-
+/**
+ * returns the previous element in the tree
+ * @returns {DominityElement} 
+ */
   previous (){ 
       return new DominityElement(this.elem.previousElementSibling) 
   } 
-
- clone(condition = true) {
-   return new DominityElement(this.elem.cloneNode(condition))
+/**
+ * clones an element
+ * @param {boolean} deep -if true a deep clone is created
+ * @returns {DominityElement} -clone is returned
+ */
+ clone(deep = true) {
+   return new DominityElement(this.elem.cloneNode(deep))
  }
- cloneContent(condition=true){
-   return new DominityElement(this.elem.content.cloneNode(condition))
+/**
+ * clones the content of an element
+ * @param {boolean} deep - if its deep or not
+ * @returns {DominityElement} -returns the cloned content
+ */
+ cloneContent(deep=true){
+   return new DominityElement(this.elem.content.cloneNode(deep))
  }
 
-
+/**
+ * gives the closest element to this
+ * @param {string} q-query to be matched 
+ * @returns {DominityElement} -element discovered is returned
+ */
  closest(q){ 
     return new DominityElement(this.elem.closest(q))    
  } 
-
+/**
+ * checks if the element is contained as a child in this element
+ * @param {HTMLELement|DominityElement} nod -child to be checked for
+ * @returns {boolean} -truth or false
+ */
  contains(nod){ 
    if(nod.dominityElem){ 
    return this.elem.contains(nod.elem) 
@@ -525,7 +645,7 @@ if(!this.template){
    if(typeof q=='string'){ 
      return this.elem.matches(q) 
    }else if(typeof q=='object'){ 
-     if(typeof q==typeof this){ 
+     if(q.dominityElem){ 
        return q===this 
      }else{ 
        return q===this.elem 
