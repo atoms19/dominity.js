@@ -1,8 +1,40 @@
-/* problem in loops where previous elements are deleted in loop*/
+/*Dominity.js
+==================================================>
+-DominityELement (create,el,_el,$el,$$el)
+-Reactive   (reactable)
+-DominityRouter
+----------
+
+fixes to be worked on
+
+-loops only works on elems without anything except loops
+-reactTo not being able to cope with 2 or more dependencies
+-reactTo and integration with objects as reactables
+
+upcomming features 
+
+-router improvements
+-bind() to observe and set any attribute
+-better error logging 
+-focus lock
+-js doc comments (provides better description to your code)
+-npm package
+-website with docs
 
 
+*/
+
+
+/**
+ * a wrapper for normal DOM elements with additional methods to make it reactive 
+ * @class
+ */
 class DominityElement{ 
-
+/**
+ * creates a new instance of  DOminityElement
+ * @constructor
+ * @param {string|HTMLElement} qry -query or HTMLELement to be converted to DominityInstance
+ */
   constructor (qry){ 
     if(typeof qry=='string'){ 
       this.elem=document.querySelector(qry)
@@ -14,31 +46,34 @@ class DominityElement{
       console.error(`DominityError: element of query '${qry}'  NOT  FOUND `)
       return
     }
-    //properties goes here 
-    this.dominityElem=true 
-    this.childCount=this.elem.childElementCount 
+    this.dominityElem=true
     this.tag=this.elem.tagName
-    this.template=false
+    this.template=false //for later use to store content
     
-
   } 
-
-
-  //content updation 
+/**
+ * gets or sets the text content of element
+ * @param {string} [val] -value can be left blank to get the current text inside the element
+ * @returns {string|this} 
+ */
   text(val=null){ 
     if(val==null){ 
       return this.elem.textContent 
 
     }else{
 if(!this.template){
-  this.template=val
+  this.template=val //stores previous content
 }
       this.elem.textContent=val 
       return this 
     } 
   }
 
-  //reactive states
+  /**
+   * to make text of an element reactive to reactables
+   * @param  {...reactive} s- reactables u want the content of this element to stay reactive to
+   * @returns {this}
+   */
   reactTo(...s){
 
       let template=this.html()
@@ -64,6 +99,11 @@ if(!this.template){
    return this
   }
 
+  /**
+   * used to set or get the innerHTML of an element
+   * @param {string} [val]- the innerHTML to be set
+   * @returns {string|this}
+   */
   html(val=null){ 
     if(val==null){ 
       return this.elem.innerHTML 
@@ -73,6 +113,11 @@ if(!this.template){
     } 
   } 
 
+/**
+ * used to set or get outterHTML (tag's own HTML+ whatever inside)
+ * @param {string} [val]- outterHTML to be set
+ * @returns {string|this}
+ */
   code(val=null){ 
     if(val==null){ 
       return this.elem.outerHTML 
@@ -82,15 +127,31 @@ if(!this.template){
     } 
   } 
 
-  //content addition 
+  /**
+ * used to attach textContent
+ * @param {string} [val]- text to be added to the element
+ * @returns {string|this}
+ */
   addText(val=''){ 
     this.elem.textContent+=val 
     return this 
   } 
+
+  /**
+   * used to add to innerHTML of an element
+   * @param {string} [val]- the html to be added
+   * @returns {string|this}
+   */
   addHtml(val=''){ 
     this.elem.innerHTML+=val 
     return this 
   } 
+  
+  /**
+ * used to attach  outterHTML (tag's own HTML+ whatever inside)
+ * @param {string} [val]- outterHTML to be added
+ * @returns {string|this}
+ */
   addCode(val=''){ 
     this.elem.outerHTML+=val 
     return this 
@@ -98,16 +159,35 @@ if(!this.template){
 
 
   //content placement 
+/**
+ * allows to place HTML string at precise positions marked by numbers 1tag2 .... 3/tag4 
+ * @param {string} placement -can be any of the four 'beforebegin|afterbegin|beforeend|afterend'
+ * @param {string} code  -HTML to be inserted
+ * @returns {this}
+ */
   insertHtml(placement,code){ 
     this.elem.insertAdjacentHTML(placement,code) 
     return this 
-    } 
+    }
+    /**
+ * allows to place text at precise positions marked by numbers 1tag2 .... 3/tag4 
+ * @param {string} placement -can be any of the four 'beforebegin|afterbegin|beforeend|afterend'
+ * @param {string} txt  -text to be inserted
+ * @returns {this}
+ */
   insertTxt(placement,txt){ 
     this.elem.insertAdjacentText(placement,txt) 
     return this 
     } 
 //css styling  
-
+/**
+ * allows u to get or set CSS properties
+ * @param {string|object} prp -property value to be get or set 
+ * @param {string} [val] - value to set the prop
+ * 
+ * you can provide an object with multiple prop value pairs to bulk set style 
+ * @returns {string|this}
+ */
   style(prp,val=null){ 
     if(typeof prp=='string'){ 
       if(val==null){ 
@@ -127,33 +207,64 @@ if(!this.template){
   } 
 
   //class manipulation 
+  /**used to set classes to an element
+   * @param {...string} className- classes to be set on the element
+   * @returns {this}
+   */
   class(){ 
     Array.from(arguments).forEach((c)=>{ 
       this.elem.classList.add(c) 
     }) 
     return this 
   } 
+  /**
+   * used to remove classes from an element
+   * @param {...string} className- classes to be removed
+   * @returns {this}
+   */
   removeClass() { 
     Array.from(arguments).forEach((c) => { 
       this.elem.classList.remove(c) 
     }) 
     return this 
   } 
+  /**
+   * used to toggle classes from an element
+   * @param {...string} className- classes to be toggled
+   * @returns {this}
+   */
   toggleClass() { 
     Array.from(arguments).forEach((c) => { 
       this.elem.classList.toggle(c) 
     }) 
     return this 
-  } 
+  }
+  /**
+   * used to check if an element has certain class
+   * @param {...string} className- classes to be checked
+   * @returns {boolean}
+   */ 
   hasClass(cls) { 
     return this.elem.classList.contains(cls) 
-  } 
+  }
+  /**
+   * gets  classes from the classlist by its index
+   * @param {number} index- index of className
+   * @returns {string}
+   */
   getClass(index = 0) { 
     return this.elem.classList.item(index) 
   } 
 
 
   //attribute manipulation 
+  /**
+ * allows u to get or set attributes of an element
+ * @param {string|object} prp -attribute value to be get or set 
+ * @param {string} [val] - value to set the attribute to 
+ * you can provide an object with multiple attribute value pairs to bulk set attributes
+ * @returns {string|this}
+ */
   attr(prp,val=null){ 
     if(typeof prp=='string'){ 
       if(val==null){ 
@@ -170,19 +281,35 @@ if(!this.template){
       }) 
       return this 
     } 
-  } 
+  }
+  /**
+   * used to check if an element has certain attribute
+   * @param {...string} attributeName- attribute to be checked
+   * @returns {boolean}
+   */ 
   hasAttr(val=null){ 
     if(val!=null){ 
    return this.elem.hasAttribute(val) 
     }else if(val==null){ 
       return this.elem.hasAttributes() 
     } 
-  } 
+  }
+  /**
+   * used to remove attbutes from an element
+   * @param {...string} attributes-attributes to be removed
+   * @returns {this}
+   */
   removeAttr(){ 
     Array.from(arguments).forEach((at)=>{ 
       this.elem.removeAttribute(at) 
     }) 
-  } 
+  }
+  /**
+   * used to toggle attribute of an element
+   * @param {string} atr- attribute to be toggled
+   * @param {string} [val]- value of attribute to be toggled
+   * @returns {this}
+   */
   toggleAttr(atr,val=""){ 
     if(this.hasAttr(atr)){ 
       this.removeAttr(atr) 
@@ -193,6 +320,11 @@ if(!this.template){
   } 
 
   //value and input methods 
+  /**
+   * used to set or get value of an input element
+   * @param {any} val 
+   * @returns 
+   */
   value(val=null){ 
     if(val==null){ 
       return this.elem.value 
@@ -254,70 +386,6 @@ if(!this.template){
    this.checkFor('touchend',handleUP)
    return this
  }
-
- enableSwipe(swipeDistance=50){
-   this.isSwiping=false
-   let sx,sy,ex,ey;
-   function handleStart(e){
-     e.preventDefault();
-   this.isSwiping= true;
-
-   if (e.type === 'touchstart') {
-     sx = e.touches[0].clientX;
-     sy = e.touches[0].clientY;
-   } else if (e.type === 'mousedown') {
-     sx= e.clientX;
-     sy = e.clientY;
-   }
-   }
-   function handleMove(e) {
-   if (!this.isSwiping) return;
-
-   if (e.type === 'touchmove') {
-     ex = e.touches[0].clientX;
-     ey= e.touches[0].clientY;
-   } else if (e.type === 'mousemove') {
-     ex = e.clientX;
-     ey = e.clientY;
-   }
- }
- let element=this
- function handleEnd(event) {
-   if (!this.isSwiping) return;
-
-   this.isSwiping = false;
-
-   const dx = ex-sx;
-   const dy= ey - sy;
-   const distance = Math.sqrt(dx ** 2 + dy ** 2);
-
-   let actualDirection;
-   if (Math.abs(dx) > Math.abs(dy)) {
-     actualDirection = dx > 0 ? 'right' : 'left';
-   } else {
-     actualDirection = dy > 0 ? 'down' : 'up';
-   }
-
-   if ( distance >= swipeDistance) {
-
-     const swipeEvent = new CustomEvent('swipe', { direction: actualDirection ,distance:distance});
-     element.dispatchEvent(swipeEvent);
-   }
-   // Add both touch and mouse event listeners to the element
- element.checkFor('touchstart',()=>{ handleStart(e)});
- element.checkFor('touchmove',()=>{ handleMove(e)});
- element.checkFor('touchend',()=>{handleEnd(e)});
-
- element.checkFor('mousedown', handleStart);
- element.checkFor('mousemove', handleMove);
- element.checkFor('mouseup', handleEnd);
-
- }
- return this
-
- }
-
-
   //dom manipulation{this} 
 
   addTo(elm){ 
@@ -448,12 +516,16 @@ if(!this.template){
 
    } 
  } 
-
+/**
+ * checks if the element matches a specific query or an element
+ * @param {string} q- query to be matched 
+ * @returns {boolean}
+ */
  matches(q){ 
    if(typeof q=='string'){ 
      return this.elem.matches(q) 
    }else if(typeof q=='object'){ 
-     if(q.dominityElem){ 
+     if(typeof q==typeof this){ 
        return q===this 
      }else{ 
        return q===this.elem 
@@ -462,24 +534,39 @@ if(!this.template){
  } 
 
  //appearance 
+ /**
+  * hides an element using CSS
+  * @returns {this}
+  */
  hide() { 
    this.style("display", "none"); 
    return this 
  } 
+ /**
+  * shows the element hidden using hide()
+  * @param {string} [disp] -display property u want the element to be displayed  
+  * @returns {this}
+  */
  show(disp = "block") { 
    this.style("display", disp); 
    return this 
- } 
+ }
+ /**
+  * toggles hide and show
+  * @param {function} [ondisp] -callback to be called when displayed
+  * @param {function} [onhide] -callback to be called when hidden
+  * @returns {this}
+  */
  toggleHide(ondisp, onhide) { 
    if (this.style("display") == "none") { 
      this.show() 
      if (ondisp != undefined) { 
-       ondisp(new DominityElement(this.elem)) 
+       ondisp(this) 
      } 
    } else if (this.style("display") != "none") { 
      this.hide() 
      if (onhide != undefined) { 
-       onhide(new DominityElement(this.elem)) 
+       onhide(this) 
      } 
    } 
 
@@ -487,7 +574,11 @@ if(!this.template){
  }
 
 
-
+/**
+ * allows to show or hide an element depending on a reactable
+ * @param {reactive|boolean} bool - expression or reactable 
+ * @returns 
+ */
  showIf(bool){
    let elemS=this
    if(bool instanceof reactive){
@@ -508,7 +599,12 @@ if(!this.template){
    return this
 
  }
-
+/**
+ * 
+ * @param {reactive} list -any iterable reactable
+ * @param {function} callback -function to be called on each iteration
+ * @returns {this}
+ */
  loops(list,callback){
    let elemS=this
    if(list instanceof reactive){
@@ -524,7 +620,11 @@ if(!this.template){
    console.error('DominityError: list item for ._elFor has to be a reactive object made with reactable(')
    return this
  }
-
+/**
+ * for inputs/select allows to 2 way bind value to a reactable
+ * @param {reactive|any} target 
+ * @returns {this}
+ */
  model(target){
 let attr='value'
 if(this.attr('type')=='checkbox'){
@@ -572,7 +672,7 @@ let val=attr=='checked'?this.elem.checked:this.value()
 
    return this
  }
- //binder
+ //binder---indevelopment
  binder(attr,target){
   if(target instanceof reactive){
     target.subscribe((d)=>{
@@ -587,6 +687,11 @@ let val=attr=='checked'?this.elem.checked:this.value()
 
 
  //actions
+ /**
+  * focus or blurs an element depending on val true or not
+  * @param {boolean} val -if true focuses else blurs
+  * @returns 
+  */
  focus(val = true) { 
    if (val == true) { 
      this.elem.focus() 
@@ -595,18 +700,29 @@ let val=attr=='checked'?this.elem.checked:this.value()
    } 
    return this 
  } 
-
+/**
+ * clicks an element
+ * @returns {this}
+ */
  click(){ 
    this.elem.click() 
 
    return this 
  } 
-
+/**
+ * scrolls to the element
+ * @param {boolean|object} [s]- options/scroll 
+ * @see[scrollIntoView](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView)
+ * @returns {this}
+ */
  scrollTo(s = true) { 
    this.elem.scrollIntoView(s) 
    return this 
  } 
-
+/**
+ * gets the scroll position and size of the element
+ * @returns {object} 
+ */
  getScrollInfo(){ 
    return { 
      height:this.elem.scrollHeight, 
@@ -616,11 +732,18 @@ let val=attr=='checked'?this.elem.checked:this.value()
    } 
  } 
 
-
+/**
+ * returns elements size
+ * @returns {getBoundingClientRect}
+ */
  getSizeInfo(){ 
    return this.elem.getBoundingClientRect() 
  } 
-
+/**
+ * requests/cancels the element to be made fullscreen(cross browser compatible)
+ * @param {boolean} val - if true to set an element to fullscreen ,false to make it normal 
+ * @returns {this}
+ */
  fullScreen(val = true) { 
    if (val == true) { 
      if (this.elem.requestFullScreen) { this.elem.requestFullScreen() } 
