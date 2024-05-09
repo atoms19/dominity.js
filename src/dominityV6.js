@@ -909,28 +909,60 @@ class finderAll{
 
 
 //make elem 
+/**create an element with dominity
+ * @function 
+ * @param {string} eli-element type to be created html tagname
+ * @param {boolean} app -wether the a
+ * @param {DominityElement|HTMLElement} target 
+ * @returns {DominityElement}
+ */
 function create(eli,app=true,target=document.body) { 
-    this.element=document.createElement(eli) 
+    let element=document.createElement(eli) 
     if(app){ 
-    target.appendChild(this.element) 
+    target.appendChild(element) 
     } 
-    return new DominityElement(this.element) 
+    return new DominityElement(element) 
 } 
 //el
-function el(typ,txt='',attrs={}){
+/**
+ * creates a new element
+ * @param {string} typ -valid html tagname of element
+ * @param {string|object} txt-text inside the child element (if element doesnt have any text u can give an object of attribute here) 
+ * @param {object} attrs -objects with attribute value pairs 
+ * @param {HTMLElement} -target to be appended to (defaults to body)
+ * @returns {DominityElement}
+ * @see -`el()`
+ * returned element is the created child so now u are working with this child to go back to working with parent chain `.$end()`
+ */
+function el(typ,txt='',attrs={},target=document.body){
  if(typeof txt=='object'){
- return create(typ).attr(txt)
+ return create(typ,true,target).attr(txt)
  }else{
-   return create(typ).text(txt).attr(attrs)
+   return create(typ,true,target).text(txt).attr(attrs)
  }
 }
 
 //find 
+/**
+ * finds and return the element that matches the query
+ * @param {string} qry -query to be matched
+ * @returns {DominityElement}
+ */
 function $el(qry){
  return new DominityElement(qry)
 }
+/**
+ * finds and returns all elements that match the query
+ * @param {string} qry -query to be matched
+ * @returns {Array <DominityElement>}
+ */
 function $$el(qry){
- return new finderAll(qry)
+  let elemArr=[] 
+  document.querySelectorAll(qry).forEach((e)=>{ 
+      elemArr.push(new DominityElement(e)) 
+  }) 
+
+  return elemArr 
 }
 
 
@@ -938,18 +970,38 @@ function $$el(qry){
 
 
 //repeat 
+/**
+ * 
+ * @param {function} cb - callback ie code to be repeated 
+ * @param {number} limit -number of times to be repeated 
+ * @param {number} jump -number of times to be skipped each time
+ * @param {number} time -interval between each repeatation (in seconds)
+ */
+function repeat(cb,limit,jump=1,time=0.07) { 
+  let count=0
+  let interval=setInterval(()=>{
+  if(count<=limit){
+  cb()
+  count+=jump
+  }else{
+    clearInterval(interval)
+  }
+  },time*1000)
 
-function repeat(cd,limit,jump=1,ti=0.07) { 
-    this.cnt=1 
-    this.cntrl="this.cnt+="+jump 
-    this.code="()=>{"+cd+";if(this.cnt>="+limit+"){clearInterval(this.inter)}else{"+this.cntrl+"}}" 
-    this.inter=setInterval(eval(this.code),ti*1000); 
+
 } 
 
 
 
 
 //range 
+/**
+ * returns a list of numbers or characters within a certain range
+ * @param {number|string} s -starting of range
+ * @param {number|string} e -ending of range 
+ * @param {number} ingrement - skip of range
+ * @returns {Array}
+ */
 function range(s,e,ingrement=1){ 
     let nums=[] 
 
@@ -976,7 +1028,12 @@ function range(s,e,ingrement=1){
 
 
 //random 
-
+/**
+ * returns a random number within a range or returns a random element from an array if parameter is an array
+ * @param {number|array} end ending value of range (if an array then its random element will be selescted)
+ * @param {number} start -starting value 
+ * @returns {number|any}
+ */
 function random(end,start=0){ 
     if(Array.isArray(end)){ 
         return end[Math.floor(Math.random()*(end.length-start))+start] 
@@ -988,41 +1045,82 @@ function random(end,start=0){
 } 
 
 
-//copy function 
-function copy(txt){ 
-                    let input=create("input"); 
+//copy function
+/**
+ * to copy text to users clipboard
+ * @param {string} txt-string to be copied to clipboard
+ * @param {function} thencb -function to be called after copy 
+ */ 
+function copy(txt,thencb){ 
+              
+  if(navigator.clipboard){
+   navigator.clipboard.writeText(txt).then(thencb)
+  }else{
+    let input=create("input"); 
 
 
-                input.val(txt) 
-                input.elem.select(); 
-                input.elem.setSelectionRange(0, 99999);  
-                document.execCommand("copy"); 
-                input.remove()           
+    input.value(txt) 
+    input.elem.select(); 
+    input.elem.setSelectionRange(0, 99999);  
+    document.execCommand("copy"); 
+    input.remove()
+    thencb()
+  }           
 } 
 
 //reactable 
-
+/**
+ * @class
+ * a wrapper to hold reactive variables that can trigger subscribers
+ * 
+ */
 class reactive{
+  /**
+   * any variable to be made reactive
+   * @param {any} value 
+   */
  constructor(value){
    this.value=value
    this.subscribers=[]
    this.name=''
  }
+ /**
+  * this is the name to be used inside `{{}}` when paired with `reactTo()`
+  * @param {string} na 
+  * @returns {this}
+  */
  as(na){
    this.name=na
 
    return this
  }
+ /**
+  * allows u to add subscriber functions , these functions are triggered whenever the value of reactable is updated
+  * @param {function} callback 
+  */
  subscribe(callback){
    this.subscribers.push(callback)
  }
+ /**
+  * allows you to get rid of a subscriber function
+  * @param {function} callback -function to be removed
+  */
  unsubscribe(callback){
    this.subscribers.pop(subscribers.indexOf(callback))
  }
+ /**
+  * used to set/update the value of the reactable
+  * @param {any} newval 
+  */
  set(newval){
    this.value=newval
    this.update()
  }
+ /**
+  * returns the value of reactable same as `reactable.value`
+  * @param {string} [prop] -property of main reactable to be gotten
+  * @returns 
+  */
  get(prop=''){
    if(prop!=''){
    return this.value[prop]
@@ -1030,10 +1128,22 @@ class reactive{
      return this.value
    }
  }
+ /**
+  * sets a property of an object reactable
+  * @param {string} prop -property to be set 
+  * @param {any} val -value to be set 
+  */
  setProp(prop,val){
    this.value[prop]=val
    this.update()
  }
+
+ /**
+  * makes the reactable's vlaue dependant on other reactables
+  * @param {reactive} reaction -whichever reactable u want it to be dependant on
+  * @param {function} callback -this function is used to modify the dependancy ,u can run a process on dependant reactables value and the return of that is treated as the value of this reactable
+  * @returns 
+  */
  deriveFrom(reaction,callback){
    if(reaction instanceof reactive){
      reaction.subscribe(()=>{
@@ -1054,7 +1164,9 @@ class reactive{
    }
 
  }
-
+/**
+ * forces all subscribers to be called
+ */
  update(){
    this.subscribers.forEach(callback=>{
      callback(this)
@@ -1063,13 +1175,21 @@ class reactive{
  
 
 }
-
+/**
+ * creates and returns a new instance of reactive
+ * @param {any} ini -value of the reactable
+ * @returns {reactive} -reactive is returned
+ */
 function reactable(ini){
  return new reactive(ini)
 }
 
 
-
+/**
+ * @class
+ * used for client side routing
+ * 
+ */
 class DominityRouter{
 constructor(){
   this.path=this.getPath()
