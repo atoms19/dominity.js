@@ -4,24 +4,21 @@
 
 ### Introduction
 
-Dominity is a simple JavaScript library designed to help u write HTML like syntax in javascript  which makes logic integration and componentation way easier
+Dominity is a simple and lightweight JavaScript library designed to help u write html like syntax in js to make reusable reactive componets
 
-it even has reactive states allowing you to automatically update the elements contents when the state changes
+its reactive hence allows you to automatically update the elements contents when the state changes
+its coupled with a client side router as well 
  
-#### usability 
-
-Dominity doesn't have to replace HTML at all ,u can use it with HTML to add interactability and reactivity easily with less hassle 
-
 
 ### usage
-u can easily add dominity to your HTML file using a script tag
+u can easily add dominity to your HTML file using a script tag or by our npm package
 
 ```html
 
 <script src="https://cdn.jsdelivr.net/gh/atoms19/dominity.js@latest/src/DOMINITY.js"></script>
 ```
 its minified size is tiny and wont impact your performance at all unlike other bulky frameworks 
-
+so tiny infact its just little less than 5kib
 
 ### basics
 
@@ -30,11 +27,10 @@ there are 2 styles to use Dominity
 1) pure js style
 2) html+js style
 
-
 #### pure js style
  In this style of programming you'll not be touching the HTML file after u placed the `dominity.js` script tag in your head 
 
-You'll be making all elements using dominity's `el()` function
+You'll be making all(most) elements using dominity's `el()` function
 
 `el(typ, txt = '', attrs = {})`: creates an element and attaches it to the body,
 - 1st argument specifies the tagname
@@ -51,6 +47,8 @@ see more on syntax section
 in this style of programming with Dominity you'll be using your HTML file and make a web page traditionally. you'll use dominity functions when you need to bring interactivity or reactivity to the element 
 here Dominity operates similiar to JQuery a popular js library
 
+you can still use `el()` to curate reusable parts of your app
+
 - `$el(qry)`: Finds and returns a dominity DOM element matching the specified query.
 
 - `$$el(qry)`: Finds and returns an array of dominity DOM elements matching the specified query.
@@ -58,7 +56,7 @@ here Dominity operates similiar to JQuery a popular js library
 
 dominity DOM elemnts are are objects that have special methods and props to make it easy to style ,add events ,change attributes etc list of all methods are given as a table in the end of documentation
 
-Dominity DOM elements support chaining for all methods except for those meant to retrive data
+Dominity DOM elements support chaining for all methods except for those meant to retrive data or child
 Dominity DOM elements are capable of being stored in a variable like any other object
 
 
@@ -84,6 +82,10 @@ backgroundColor:'red'
    })
 })
 //here button changes color when u click it
+
+$('#s2').addChild(Button('click me','red'))
+
+//addchild can also be used to attach a component
 
 ```
 
@@ -120,9 +122,11 @@ in Dominity unlike HTML its not mandatory to close the tag at all if u dont want
 technically when u chain `$end()` its returning the parent instance back to u so u can continue working on the parent again 
 so in above example last three `$end()` chain can be entirely omitted and it will still work
 
+> note: if u wish to return the element u are working on dont chain `$end()` to it as it returns its parent
+
 #### Reactivity System
 
-Dominity has a unique reactive system which isn't complex ir capable as the ones in other ones but its a neat way to make your dominity elements react to data
+Dominity has a unique reactive system which isn't complex nor capable as the ones in other ones but its a neat way to make your dominity elements react to data and its tiny
 
 
 ```js
@@ -163,7 +167,23 @@ function Counter() {
     reactTo(count);
 }
 ```
+with mixed style it would look like this
 
+```html
+<div>
+<p id='disp'>count {{count}}</p>
+<button id="b1">increment</button>
+<button id="b2">decrement</button>
+</div>
+<script>
+let count=reactable(0).as('count')
+$el('#disp').reactTo(count)
+$el("#b1").onClick(s=>{count.set(count.value+1)})
+$el("#b2").onClick(s=>{count.set(count.value-1)})
+ <script> 
+```
+
+as you can see in the html +js style more things need to have id and stuff to be identified
 
 reactables can be derived from other reactables which allows one to depend on others value
 ```js
