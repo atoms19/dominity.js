@@ -323,7 +323,7 @@ if(!this.template){
   /**
    * used to set or get value of an input element
    * @param {any} val 
-   * @returns 
+   * @returns {any}
    */
   value(val=null){ 
     if(val==null){ 
@@ -360,7 +360,7 @@ if(!this.template){
   /**
    * triggers a new event
    * @param {any} ev -event to be dispatched
-   * @returns 
+   * @returns {this}
    */
   causeEvent(ev) { 
     this.elem.dispatchEvent(ev) 
@@ -389,7 +389,7 @@ if(!this.template){
  /**
   * enables the ability to listen for 'hold' events on the element
   * @param {number} [holdtime] -time delay for click and hold to be triggered
-  * @returns 
+  * @returns {this}
   */
  enableHold(holdtime=0.5){
    this.isHolding=false
@@ -697,7 +697,7 @@ if(!this.template){
 /**
  * allows to show or hide an element depending on a reactable
  * @param {reactive|boolean} bool - expression or reactable 
- * @returns 
+ * @returns {this}
  */
  showIf(bool){
    let elemS=this
@@ -810,7 +810,7 @@ let val=attr=='checked'?this.elem.checked:this.value()
  /**
   * focus or blurs an element depending on val true or not
   * @param {boolean} val -if true focuses else blurs
-  * @returns 
+  * @returns {this}
   */
  focus(val = true) { 
    if (val == true) { 
@@ -954,7 +954,7 @@ function $el(qry){
 /**
  * finds and returns all elements that match the query
  * @param {string} qry -query to be matched
- * @returns {Array <DominityElement>}
+ * @returns {DominityElement[]}
  */
 function $$el(qry){
   let elemArr=[] 
@@ -1119,7 +1119,7 @@ class reactive{
  /**
   * returns the value of reactable same as `reactable.value`
   * @param {string} [prop] -property of main reactable to be gotten
-  * @returns 
+  * @returns {any}
   */
  get(prop=''){
    if(prop!=''){
@@ -1142,7 +1142,7 @@ class reactive{
   * makes the reactable's vlaue dependant on other reactables
   * @param {reactive} reaction -whichever reactable u want it to be dependant on
   * @param {function} callback -this function is used to modify the dependancy ,u can run a process on dependant reactables value and the return of that is treated as the value of this reactable
-  * @returns 
+  * @returns {this}
   */
  deriveFrom(reaction,callback){
    if(reaction instanceof reactive){
