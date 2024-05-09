@@ -1,5 +1,7 @@
 ## Dominity js
 
+[view js docs](https://atoms19.github.io/dominity.js/out/)
+
 ### Introduction
 
 Dominity is a simple JavaScript library designed to help u write HTML like syntax in javascript  which makes logic integration and componentation way easier
@@ -324,7 +326,7 @@ let numberRange = range(1, 10);
 
 ### list of methods
 these are all the methods u can chain with any element retrived or created using Dominty functions
-
+[view full docs](https://atoms19.github.io/dominity.js/out/)
 methods included:
 
 | Method                  | Description                                                                                    |
@@ -382,6 +384,7 @@ methods included:
 | `onClick(cb)`           | Sets up an event listener for the "click" event.                                                 |
 | `enableHold(holdtime=0.5)` | Enables holding event on the element,you'll have to listen to this using checkFor.                                                         |
 | `enableSwipe(swipeDistance=50)` | Enables swipe event on the element, use checkFor same as above.                                                         |
+
 
 > you can still access orginal elements methods and props by using `<dominityElem>.elem.<orginal method>()`
 
