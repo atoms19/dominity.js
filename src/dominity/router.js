@@ -3,7 +3,7 @@
  * used for client side routing
  * 
  */
-class DominityRouter{
+export default class DominityRouter{
     constructor(){
       this.path=this.getPath()
       this.defaultPath=''

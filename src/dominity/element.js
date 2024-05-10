@@ -5,7 +5,7 @@
  * @class
  */
 
-class DominityElement{ 
+export default class DominityElement{ 
     /**
      * creates a new instance of  DOminityElement
      * @constructor

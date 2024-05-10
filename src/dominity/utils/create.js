@@ -7,7 +7,7 @@
  * @param {DominityElement|HTMLElement} target 
  * @returns {DominityElement}
  */
-function create(eli,app=true,target=document.body) { 
+ export function create(eli,app=true,target=document.body) { 
     let element=document.createElement(eli) 
     if(app){ 
     target.appendChild(element) 
@@ -25,7 +25,7 @@ function create(eli,app=true,target=document.body) {
  * @see -`el()`
  * returned element is the created child so now u are working with this child to go back to working with parent chain `.$end()`
  */
-function el(typ,txt='',attrs={},target=document.body){
+export function el(typ,txt='',attrs={},target=document.body){
  if(typeof txt=='object'){
  return create(typ,true,target).attr(txt)
  }else{

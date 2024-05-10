@@ -4,7 +4,7 @@
  * a wrapper to hold reactive variables that can trigger subscribers
  * 
  */
-class reactive{
+export default class reactive{
     /**
      * any variable to be made reactive
      * @param {any} value 
@@ -110,7 +110,7 @@ class reactive{
    * @param {any} ini -value of the reactable
    * @returns {reactive} -reactive is returned
    */
-  function reactable(ini){
+ export function reactable(ini){
    return new reactive(ini)
   }
   

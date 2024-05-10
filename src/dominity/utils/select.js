@@ -5,7 +5,7 @@
  * @param {string} qry -query to be matched
  * @returns {DominityElement}
  */
-function $el(qry){
+export function $el(qry){
     return new DominityElement(qry)
    }
    /**
@@ -13,7 +13,7 @@ function $el(qry){
     * @param {string} qry -query to be matched
     * @returns {DominityElement[]}
     */
-   function $$el(qry){
+export function $$el(qry){
      let elemArr=[] 
      document.querySelectorAll(qry).forEach((e)=>{ 
          elemArr.push(new DominityElement(e)) 

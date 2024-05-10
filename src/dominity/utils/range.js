@@ -7,7 +7,7 @@
  * @param {number} ingrement - skip of range
  * @returns {Array}
  */
-function range(s,e,ingrement=1){ 
+export default function range(s,e,ingrement=1){ 
     let nums=[] 
 
 
