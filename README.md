@@ -1,7 +1,8 @@
 ## Dominity js
 
-[view js docs](https://atoms19.github.io/dominity.js/out/)
+[view js docs](https://atoms19.github.io/dominity.js/js%20docs-outdated)
 
+[visit documentation site](https://dominity-docs.vercel.app)
 ### Introduction
 
 Dominity is a simple and lightweight JavaScript library designed to help u write html like syntax in js to make reusable reactive componets
@@ -263,7 +264,7 @@ el('form')
   ._el('fieldset','',{
     role:'group'
   }).
-    _el('input','',{
+    _el('input',{
       type:'text'
       ,placeHolder:'enter task'
       ,id:'infield'
@@ -288,7 +289,7 @@ el('form')
 el('ul').loops(tasks,(obj,p)=>{
   p.
     _el('li').
-      _el('input','',{
+      _el('input',{
         type:'checkbox',
        
       }).attr(obj.done?('checked'):'unchecked','').checkFor('input',()=>{

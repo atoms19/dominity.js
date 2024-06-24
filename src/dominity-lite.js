@@ -2,25 +2,7 @@
 ==================================================>
 -DominityELement (create,el,_el,$el,$$el)
 -Reactive   (reactable)
--DominityRouter
 ----------
-
-fixes to be worked on
-
--loops only works on elems without anything except loops
--reactTo not being able to cope with 2 or more dependencies
--reactTo and integration with objects as reactables
-
-upcomming features 
-
--router improvements
--bind() to observe and set any attribute
--better error logging 
--focus lock
--js doc comments (provides better description to your code)
--npm package
--website with docs
-
 
 */
 
@@ -50,23 +32,8 @@ class DominityElement{
         this.tag=this.elem.tagName
         this.template=false //for later use to store content
         
-        
-        
       }
-
-      /**
-       * organise outwardly accessable properties 
-       * @param {string} propname 
-       * @param {any} value 
-       * @returns 
-       */
-      addOutProp(propname,value){
-        this.outProps={
-
-        }
-        this.outProps[propname]=value
-        return this
-      }
+      
     /**
      * gets or sets the text content of element
      * @param {string} [val] -value can be left blank to get the current text inside the element
@@ -115,8 +82,8 @@ class DominityElement{
     
        return this
       }
-
-
+  
+  
     
       /**
        * used to set or get the innerHTML of an element
@@ -132,42 +99,8 @@ class DominityElement{
         } 
       } 
     
-    /**
-     * used to set or get outterHTML (tag's own HTML+ whatever inside)
-     * @param {string} [val]- outterHTML to be set
-     * @returns {string|this}
-     */
-      code(val=null){ 
-        if(val==null){ 
-          return this.elem.outerHTML 
-        }else{ 
-          this.elem.outerHTML=val 
-          return this 
-        } 
-      } 
     
-    
-      //content placement 
-    /**
-     * allows to place HTML string at precise positions marked by numbers 1tag2 .... 3/tag4 
-     * @param {string} placement -can be any of the four 'beforebegin|afterbegin|beforeend|afterend'
-     * @param {string} code  -HTML to be inserted
-     * @returns {this}
-     */
-      insertHtml(placement,code){ 
-        this.elem.insertAdjacentHTML(placement,code) 
-        return this 
-        }
-        /**
-     * allows to place text at precise positions marked by numbers 1tag2 .... 3/tag4 
-     * @param {string} placement -can be any of the four 'beforebegin|afterbegin|beforeend|afterend'
-     * @param {string} txt  -text to be inserted
-     * @returns {this}
-     */
-      insertTxt(placement,txt){ 
-        this.elem.insertAdjacentText(placement,txt) 
-        return this 
-        } 
+     
     //css styling  
     /**
      * allows u to get or set CSS properties
@@ -186,11 +119,7 @@ class DominityElement{
             return this 
           } 
         }else if(typeof prp=='object'){ 
-          let props=Object.keys(prp) 
-          let values=Object.values(prp) 
-          props.forEach((p,i)=>{ 
-            this.style(p,values[i]+'') 
-          }) 
+          Object.assign(this.elem.style,prp)
           return this 
         } 
       } 
@@ -251,7 +180,7 @@ class DominityElement{
         }
         return this
       }
-
+  
       /**
        * used to check if an element has certain class
        * @param {...string} className- classes to be checked
@@ -260,7 +189,7 @@ class DominityElement{
       hasClass(cls) { 
         return this.elem.classList.contains(cls) 
       }
-
+  
     
       //attribute manipulation 
       /**
@@ -384,8 +313,8 @@ class DominityElement{
         }))
         return this
       }
-
-
+  
+  
       /**
        * checks for click events
        * @param {function} cb -call back function
@@ -398,36 +327,7 @@ class DominityElement{
        return this
      }
      
-     /**
-      * enables the ability to listen for 'hold' events on the element
-      * @param {number} [holdtime] -time delay for click and hold to be triggered
-      * @returns {this}
-      */
-     enableHold(holdtime=0.5){
-       this.isHolding=false
-       const element=this
-       function handleDOWN(e){
-    
-         this.isHolding=true
-         this.timeout=setTimeout((e)=>{
-    
-           if(this.isHolding){
-    
-           element.causeEvent(new CustomEvent('hold',{details:e}))
-           }
-         },holdtime*1000)
-    
-       }
-       function handleUP(e){
-         this.isHolding=false
-         clearTimeout(this.timeout)
-       }
-       this.checkFor('mousedown',handleDOWN)
-       this.checkFor('touchstart',handleDOWN)
-       this.checkFor('mouseup',handleUP)
-       this.checkFor('touchend',handleUP)
-       return this
-     }
+     
       //dom manipulation{this} 
     /**
      * appends the element to another element provided 
@@ -477,16 +377,20 @@ class DominityElement{
      */ 
       _el(typ,txt='',attrs={}){
         
-        if(!typ.dominityElem){
-            if(typeof txt=='object'){
-            return this.create(typ).attr(txt)
-            }else{
-              return this.create(typ).text(txt).attr(attrs)
-            }
-            }else{
-              this.addChild(typ)
-              return typ
-            }
+        
+          let created=(!typ.dominityElem)?this.create(typ):typ
+          if(!typ.dominityElem) this.addChild(created)
+  
+          if(typeof txt=='object'){
+            created.attr(txt)
+          }
+          else{
+            created.text(txt).attr(attrs)
+          }
+  
+  
+            return created
+            
     
       }
     
@@ -495,8 +399,8 @@ class DominityElement{
      * @param {*} el 
      * @returns {DominityElement} -returned is an instance of child object to go back to working with parent chain `.$end()`
      */
-     create(el){
-       this.addedChild=create(el)
+     create(elem){
+       this.addedChild=el(elem)
        this.addChild(this.addedChild)
        return this.addedChild
      }
@@ -528,33 +432,14 @@ class DominityElement{
         this.elem.insertAdjacentElement(placement, nod) 
         return this 
       }
-      /**
-      * removes children to the element , multiple child elements can be removed seperated by comma 
-      * @returns {this} 
-      */   
-      removeChild(){ 
-        Array.from(arguments).forEach((nod)=>{ 
-          this.elem.removeChild(this.elem.childNodes[nod]) 
-        }) 
-          return this 
-      } 
-    /**
-     * 
-     * @param {HTMLELement} child - child to be replaced
-     * @param {HTMLElement} nod - new child
-     * @returns {this}
-     */
-      replaceChild(child, nod) { 
-        this.elem.replaceChild(nod, child) 
     
-        return this 
-      } 
+
     /**
      * finds a child by query 
      * @param {string} q- query to find child
      * @returns {DominityElement} -returns the child if found
      */
-      getChild(q) { 
+      $_el(q) { 
     
         return new DominityElement(this.elem.querySelector(q)) 
       }
@@ -563,7 +448,7 @@ class DominityElement{
        * @param {string} q -query to find child 
        * @returns {array} -returns array of dominityelements
        */
-      getChildren(q) { 
+      $$_el(q) { 
         return Array.from(this.elem.querySelectorAll(q)).map(x => new DominityElement(x)) 
       } 
     /**
@@ -579,7 +464,8 @@ class DominityElement{
      * @returns {DominityElement} - returns the parent element
      */
       parent() { 
-        return new DominityElement(this.elem.parentNode) 
+      
+        return new DominityElement(this.elem.parentNode)     
     
       }
       //indevelopment
@@ -597,6 +483,7 @@ class DominityElement{
        * @returns {DominityElement} -returns parent so u can go back to working with parent element
        */
       $end(){
+        
         return this.parent()
       }
     
@@ -604,14 +491,14 @@ class DominityElement{
      * returns the next element in the tree
      * @returns {DominityElement} 
      */
-      after(){ 
+      next(){ 
           return new DominityElement(this.elem.nextElementSibling) 
       } 
     /**
      * returns the previous element in the tree
      * @returns {DominityElement} 
      */
-      before (){ 
+      previous (){ 
           return new DominityElement(this.elem.previousElementSibling) 
       } 
     /**
@@ -622,43 +509,15 @@ class DominityElement{
      clone(deep = true) {
        return new DominityElement(this.elem.cloneNode(deep))
      }
-
+  
      /**
       * creates a component instance from contnet of template tag
       */
      asComponent(){
       return this.cloneContent(new DominityElement(this.elem.content.cloneNode(true)))
      }
-
-    /**
-     * checks if the element is contained as a child in this element
-     * @param {HTMLELement|DominityElement} nod -child to be checked for
-     * @returns {boolean} -truth or false
-     */
-     contains(nod){ 
-       if(nod.dominityElem){ 
-       return this.elem.contains(nod.elem) 
-       }else{ 
-            return this.elem.contains(nod) 
+  
     
-       } 
-     } 
-    /**
-     * checks if the element matches a specific query or an element
-     * @param {string} q- query to be matched 
-     * @returns {boolean}
-     */
-     matches(q){ 
-       if(typeof q=='string'){ 
-         return this.elem.matches(q) 
-       }else if(typeof q=='object'){ 
-         if(q.dominityElem){ 
-           return q===this 
-         }else{ 
-           return q===this.elem 
-         } 
-       } 
-     } 
     
      //appearance 
      /**
@@ -760,10 +619,8 @@ class DominityElement{
       return this
   
     }
-
-
-
-
+  
+  
     /**
      * 
      * @param {reactive} list -any iterable reactable
@@ -833,13 +690,14 @@ class DominityElement{
           if(this.elem.checked){
             val=[...target.value,this.elem.name]
             
-
+  
           }else{
+  
             val=target.value.filter((t)=>t!=this.elem.name)
           }
           }
-
-
+  
+  
           }
     
                target.set(val)
@@ -851,23 +709,27 @@ class DominityElement{
     
        return this
      }
-
-     //binder---indevelopment
-     binder(target,func){
+  
+     /**
+      * allows u to attach a function that operates on the element when reactive value updates
+      * @param {DominityReactive} target 
+      * @param {function} func 
+      * @returns {DominityElement}
+      */
+     binder(target,func,autocall=false){
       if(target instanceof DominityReactive){
         target.subscribe((d)=>{
                     func(this,d.value)
-        },false)
+        },autocall)
         
       }
     
     return this
      }
-     
-
-
-
-
+  
+    
+  
+  
      /**
       * animate elements with animate method
       * @param {object} props 
@@ -885,7 +747,7 @@ class DominityElement{
           priorkeyframes[prop]=this.style(prop)
         }
       })
-
+  
       let animation=this.elem.animate([priorkeyframes,props],{
         duration:duration*1000,
         easing:easing,
@@ -897,11 +759,11 @@ class DominityElement{
           callback(this);
       }
       }
-
-
-
+  
+  
+  
     return this
-
+  
     }
     
     
@@ -939,75 +801,14 @@ class DominityElement{
        this.elem.scrollIntoView(s) 
        return this 
      } 
-    /**
-     * gets the scroll position and size of the element
-     * @returns {object} 
-     */
-     getScrollInfo(){ 
-       return { 
-         height:this.elem.scrollHeight, 
-         width:this.elem.scrollWidth, 
-         x:this.elem.scrollLeft, 
-         y:this.elem.scrollTop 
-       } 
-     } 
-    
-    /**
-     * returns elements size
-     * @returns {getBoundingClientRect}
-     */
-     getSizeInfo(){ 
-       return this.elem.getBoundingClientRect() 
-     } 
-    /**
-     * requests/cancels the element to be made fullscreen(cross browser compatible)
-     * @param {boolean} val - if true to set an element to fullscreen ,false to make it normal 
-     * @returns {this}
-     */
-     fullScreen(val = true) { 
-       if (val == true) { 
-         if (this.elem.requestFullScreen) { this.elem.requestFullScreen() } 
-         else if (this.elem.webkitRequestFullscreen) { 
-           this.elem.webkitRequestFullscreen() 
-         } else if (this.elem.msRequestFullScreen) { 
-           this.elem.msRequestFullscreen() 
-         } 
-    
-       } else { 
-         if (this.elem.exitFullScreen) { this.elem.exitFullScreen() } 
-         else if (this.elem.webkitExitFullscreen) { 
-           this.elem.webkitExitFullscreen() 
-         } else if (this.elem.msExitFullScreen) { 
-           this.elem.msExitFullscreen() 
-         } 
-       } 
-    
-       return this 
-     } 
-    
     
     } 
     
-
+  
   
     //fuctions-------------------------
     
     
-    //make elem 
-    /**create an element with dominity
-     * @function 
-     * @param {string} eli-element type to be created html tagname
-     * @param {boolean} app -wether the a
-     * @param {DominityElement|HTMLElement} target 
-     * @returns {DominityElement}
-     */
-    function create(eli,app=true,target=document.body) { 
-        let element=document.createElement(eli) 
-        if(app){ 
-        target.appendChild(element) 
-        } 
-        return new DominityElement(element) 
-    } 
     //el
     /**
      * creates a new element
@@ -1020,11 +821,15 @@ class DominityElement{
      * returned element is the created child so now u are working with this child to go back to working with parent chain `.$end()`
      */
     function el(typ,txt='',attrs={},target=document.body){
+      let element=document.createElement(typ) 
+      target.appendChild(element) 
+      let delement= new DominityElement(element)
     if(typeof txt=='object'){
-    return create(typ,true,target).attr(txt)
+     delement.attr(txt)
     }else{
-      return create(typ,true,target).text(txt).attr(attrs)
+       delement.text(txt).attr(attrs)
     }
+    return delement
     }
     
     //find 
@@ -1052,107 +857,7 @@ class DominityElement{
     
     
     
-    
-    
-    //repeat 
-    /**
-     * 
-     * @param {function} cb - callback ie code to be repeated 
-     * @param {number} limit -number of times to be repeated 
-     * @param {number} jump -number of times to be skipped each time
-     * @param {number} time -interval between each repeatation (in seconds)
-     */
-    function repeat(cb,limit,jump=1,time=0.07) { 
-      let count=0
-      let interval=setInterval(()=>{
-      if(count<=limit){
-      cb()
-      count+=jump
-      }else{
-        clearInterval(interval)
-      }
-      },time*1000)
-    
-    
-    } 
-    
-    
-    
-    
-    //range 
-    /**
-     * returns a list of numbers or characters within a certain range
-     * @param {number|string} s -starting of range
-     * @param {number|string} e -ending of range 
-     * @param {number} ingrement - skip of range
-     * @returns {Array}
-     */
-    function range(s,e,ingrement=1){ 
-        let nums=[] 
-    
-    
-        if(typeof s=="string" && typeof e=="string"){ 
-    
-        for(i=s.charCodeAt(0)-96;i<e.charCodeAt(0)-96+1;i+=ingrement){ 
-            nums.push(i) 
-        } 
-            return nums.map((c)=>{ 
-                return  String.fromCharCode(96+c) 
-            }) 
-    
-    
-        }else if(typeof s=="number" && typeof e=="number"){ 
-        for(i=s;i<e+1;i+=ingrement){ 
-            nums.push(i) 
-        } 
-    
-        return nums 
-        } 
-    } 
-    
-    
-    
-    //random 
-    /**
-     * returns a random number within a range or returns a random element from an array if parameter is an array
-     * @param {number|array} end ending value of range (if an array then its random element will be selescted)
-     * @param {number} start -starting value 
-     * @returns {number|any}
-     */
-    function random(end,start=0){ 
-        if(Array.isArray(end)){ 
-            return end[Math.floor(Math.random()*(end.length-start))+start] 
-        }else{ 
-            return Math.floor(Math.random()*(end-start))+start 
-    
-        } 
-    
-    } 
-    
-    
-    //copy function
-    /**
-     * to copy text to users clipboard
-     * @param {string} txt-string to be copied to clipboard
-     * @param {function} thencb -function to be called after copy 
-     */ 
-    function copy(txt,thencb){ 
-                  
-      if(navigator.clipboard){
-       navigator.clipboard.writeText(txt).then(thencb)
-      }else{
-        let input=create("input"); 
-    
-    
-        input.value(txt) 
-        input.elem.select(); 
-        input.elem.setSelectionRange(0, 99999);  
-        document.execCommand("copy"); 
-        input.remove()
-        thencb()
-      }           
-    } 
-    
+  
     //reactable 
     /**
      * @class
@@ -1183,6 +888,7 @@ class DominityElement{
      /**
       * allows u to add subscriber functions , these functions are triggered whenever the value of reactable is updated
       * @param {function} callback 
+      * @param {boolean} autocall - to self update or not
       */
      subscribe(callback,autocall='true',isLinked=false,){
        this.subscribers.push(callback)
@@ -1229,7 +935,7 @@ class DominityElement{
        this.value[prop]=val
        this.update()
      }
-
+  
     
     
      /**
@@ -1274,9 +980,9 @@ class DominityElement{
       this.value=v
       this.update('linkLess')
      }
-
-
-
+  
+  
+  
     /**
      * forces all subscribers to be called
      */
@@ -1297,106 +1003,4 @@ class DominityElement{
      return new DominityReactive(ini)
     }
     
-    
-
-
-
-
-    /**
-     * @class
-     * used for client side routing
-     * 
-     */
-    class DominityRouter{
-      constructor(parentLayout){
-        this.path=this.getPath()
-        this.defaultPath=''
-        this.defaultFile='/index.html'
-        this.routes=[]
-       this.firstLoad=0
-      
-       this.parentLayout=parentLayout||$el('body')
-       this.backHandler=async () => {
-         if (this.firstLoad && this.getPath()!=this.defaultFile) {
-    
-           await this.handleRoute()
-    
-         } else {
-           this.replaceRoute(this.defaultPath)
-           this.firstLoad = 1
-    
-         }
-
-    
-    
-       }
-    
-    addEventListener('popstate',this.backHandler)
-    
-    addEventListener('load',
-    this.backHandler)
-      }
-      /**
-       * assigns an element to a specific route in the dominity router
-       * @param {string} route- route path name 
-       * @param {DominityElement} pageElement -component to be routed to 
-       * @param {*} [callback] - a function callback after routing optional
-       * @returns {this}
-       */
-      register(route,pageElement,callback=()=>{}){
-        let config={
-          route: route,
-          elem: pageElement,
-          callback: callback,
-          routeKey: reactable(false)
-        }
-       this.routes.push(config)
-        pageElement.renderIf(config.routeKey,(v)=>v,this.parentLayout)
-        return this
-      }
-      getPath(){
-        return window.location.pathname
-      }
-    
-       async handleRoute(){
-    
-        let routeFound=0
-        this.routes.forEach(routeObj=>{
-
-    
-          if(this.getPath()==routeObj.route){
-           routeObj.routeKey.set(true)
-           routeFound=1
-          }else{
-            routeObj.routeKey.set(false)
-          }
-        
-        })
-        
-        
-    
-      }
-      /**
-       * routes to a specific route
-       * @param {string} route -routename to be routed to 
-       */
-      routeTo(route){
-        history.pushState(null,'',route)
-      
-        this.handleRoute()
-    
-      }
-      /**
-       * replaces the current path with another 
-       * @param {string} route -new path 
-       */
-      replaceRoute(route){
-        history.replaceState(null,'',route)
-        this.handleRoute()
-      }
-
-      getQueries(){
-        return Object.fromEntries(new URLSearchParams(window.location.search).entries())
-      }
-    
-    }
+  
