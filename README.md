@@ -173,102 +173,108 @@ function Dropdown(op=false){
 }
 ```
 
-`showIf()` only renders the element if the reactable passed into it is truthy
-it hides otherwise
-
-it can also take in a condition but it wont be dynamic unless it is a reactable 
+`showIf()` only renders the element if the state passed into it is truthy
+it hides otherwise 
 
 #### filtering searchbar
 
 ```js
 function filterSearch(){
-  let search=reactable('')
+  let search=state('')
   let items=["potatoes","chicken","rice","bread"]
   
-  let filteredItems=reactable().deriveFrom(search,(val)=>{
-    return items.filter(i=>i.startsWith(val))
+  let filteredItems=derived(()=>{
+    return items.filter(i=>i.startsWith(search.value))
   })
 
-  return el('div').
-    _el('input','',{
-      placeHolder:'search in filter'
-      ,type:'search'
-    }).modal(search)
-    .$end().
-    _el('ul').loops(filteredItems,(item,parent)=>{
-        parent.
-          _el('li',item)
-      }).$end()
+return div(
+
+input({placeholder:'search in filter',
+type:'search'
+}).model(search),
+
+ul().forEvery(filterdItems,(item)=>{
+return li(item)
+})
+
+)
+
+  
   
 }
 
 ```
-the above example uses a derived reactable using`.deriveFrom()` method of a reactable
-to get a filtered list each time search value updates
+the above example uses a derived state using`.derived()`
 
-an interesting method of dominity search element is `.modal()` which allows you to actively update a reactable whenever its value changes and vice versa 
+an interesting method of dominity search element is `.model()` which allows you to actively update a state whenever its value changes and vice versa 
 
-here you can see the derived reactable filtered items is rendered as a list this is done by using `.loops()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and also the parent element for adding child elements
+here you can see the derived iterable state filtered items is rendered as a list this is done by using `.forEvery()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and element returned by the callback is added as child
 
 
 ### fully functional tasks app
 
 ```js
-let taskname=reactable('')
-let tasks=reactable(JSON.parse(localStorage.tasks))
-el('form')
-  ._el('fieldset','',{
+let taskname=state('')
+let tasks=state(JSON.parse(localStorage.tasks))
+
+
+
+
+form(
+  fieldset({
     role:'group'
-  }).
-    _el('input',{
+  },
+    input({
       type:'text'
       ,placeHolder:'enter task'
       ,id:'infield'
-    }).modal(taskname).$end().
-    _el('input','add task',{
+    }).model(taskname),
+
+    input('add task',{
       type:'submit'
-    }).$end()
-  .$end().
-  checkFor('submit',(e)=>{
+    })
+)
+ .on('submit',(e)=>{
     e.preventDefault()
     if(taskname.value !=''){
-      tasks.value.push({
+      tasks.value=[...tasks.value,{
         name:taskname.get(),
         done:false
-      })
-      tasks.update()
-      $el('#infield').value('')
+      }]
+      
+      document.querySelector('#infield').value=''
       
     }
   })
   
-el('ul').loops(tasks,(obj,p)=>{
-  p.
-    _el('li').
-      _el('input',{
+ul().forEvery(tasks,(obj)=>{
+  
+    return li(
+      input({
         type:'checkbox',
+        checked:obj.done?'true':'false'
        
-      }).attr(obj.done?('checked'):'unchecked','').checkFor('input',()=>{
+      }).on('input',()=>{
         obj.done=!obj.done
-        tasks.setProp('done',obj.done)
+        task.value.done=obj.done
         
-      })
+      }),
       
-      .$end().
-      _el('span',obj.name).style({
+      
+      span(obj.name).css({
         marginRight:'2rem',
         textDecoration:obj.done?'line-through':'none'
-      }).$end().
-      _el('button','x').class('outline').onClick((s)=>{
- tasks.set(tasks.value.filter(ob=>{
+      }),
+      button('x',{class:'outline'}).on('click',(s)=>{
+ tasks.value=[tasks.value.filter(ob=>{
    return ob!=obj
- }))
+ })]
 
       })
     
-})
+)})
   
-tasks.subscribe(()=>{
+effect(()=>{
    
  localStorage.tasks=JSON.stringify(tasks.value)
  
@@ -282,24 +288,8 @@ el('link','',{
 
 
 ```
-normally to make something like this it takes a lot of time and thinking but in dominity its all very simple `.subscribe()` method allows u to call a function when desired reactable is changed 
 
 
-
-### Utility Functions
-Dominity offers a few utility functions for common tasks, including copying text and generating random values.
-
-- `copy(txt)`: Copies the specified text to the clipboard of user 
-
-- `random(end, start = 0)`: Generates a random value within the specified range, it can also take just an array as argument and it will automatically chose a random element from that array
-
-- `range(s, e, increment = 1)`: Generates an array of numbers within the specified range. it can also generate an array of alphabets 
-
-```js
-copy("Hello, world!");
-let randomNumber = random(1, 100);
-let numberRange = range(1, 10);
-```
 
 > you can still access orginal elements methods and props by using `<dominityElem>.elem.<orginal method>()`
 
