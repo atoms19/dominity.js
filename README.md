@@ -24,16 +24,15 @@ so tiny infact its just little less than 5kib
 ### basics
 dominity gives u functions that create HTML elements thats it 
 ```js
-import D from "dominity"
+import {p,div} from "dominity"
 
-D.div("hello world",{class:"text-primary",id:'title'})
-D.p({class:'text-secondary'},`
+div("hello world",{class:"text-primary",id:'title'})
+p({class:'text-secondary'},`
 lorem ipsum dolor sit amet lorem ipsum dolor sit amet 
 lorem ipsum dolor sit amet 
 lorem ipsum dolor sit amet 
 `)
 
-D.mount("body")
 ```
 as can see from the above example the function named div creates a division and paragraph elements and mounts it to the body
 
@@ -41,10 +40,10 @@ objects with key value pairs passed in are considered attributes and strings are
 
 ```js
 
-D.ul(
- D.li(D.a('yo',{href:'#'})),
- D.li(D.a('yo',{href:'#'})),
- D.li(D.a('yo',{href:'#'})),
+ul(
+ li(a('yo',{href:'#'})),
+ li(a('yo',{href:'#'})),
+ li(a('yo',{href:'#'})),
 )
 
 ```
@@ -56,10 +55,10 @@ Dominity allows us to create componets with ease by encapsulating Dominity code 
 
 a simple button component 
 ```js
-import D from "dominity"
+import {button,h1} from "dominity"
 
 function Button(text,color){
-return D.button(text).css({
+return button(text).css({
 backgroundColor:color
 })
 }
@@ -69,9 +68,7 @@ Button('click me','blue').on('click',(e)=>{
 })
 //here button changes color when u click it
 
-D.h1(Button('click me','red'))
-
-D.mount('body')
+h1(Button('click me','red'))
 
 
 ```
