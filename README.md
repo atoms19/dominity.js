@@ -22,177 +22,132 @@ its minified size is tiny and wont impact your performance at all unlike other b
 so tiny infact its just little less than 5kib
 
 ### basics
+dominity gives u functions that create HTML elements thats it 
+```js
+import D from "dominity"
 
-there are 2 styles to use Dominity
+D.div("hello world",{class:"text-primary",id:'title'})
+D.p({class:'text-secondary'},`
+lorem ipsum dolor sit amet lorem ipsum dolor sit amet 
+lorem ipsum dolor sit amet 
+lorem ipsum dolor sit amet 
+`)
 
-1) pure js style
-2) html+js style
+D.mount("body")
+```
+as can see from the above example the function named div creates a division and paragraph elements and mounts it to the body
 
-#### pure js style
- In this style of programming you'll not be touching the HTML file after u placed the `dominity.js` script tag in your head 
+objects with key value pairs passed in are considered attributes and strings are considered as text inside the element you can even pass in other `D.<tagname>` functions to create child elements
 
-You'll be making all(most) elements using dominity's `el()` function
+```js
 
-`el(typ, txt = '', attrs = {})`: creates an element and attaches it to the body,
-- 1st argument specifies the tagname
-- 2nd argument text, its option it can be left as blank string '' 
-- 3rd is argument accepts an object which takes in attributes of the tag as key value pairs
+D.ul(
+ D.li(D.a('yo',{href:'#'})),
+ D.li(D.a('yo',{href:'#'})),
+ D.li(D.a('yo',{href:'#'})),
+)
 
-youllbe making child nodes by chaining `._el()` which takes the same set of formal argumants
-any opened tag can be optionally closed by chaining `.$end()` 
-
-see more on syntax section
-
-#### html + js style
-
-in this style of programming with Dominity you'll be using your HTML file and make a web page traditionally. you'll use dominity functions when you need to bring interactivity or reactivity to the element 
-here Dominity operates similiar to JQuery a popular js library
-
-you can still use `el()` to curate reusable parts of your app
-
-- `$el(qry)`: Finds and returns a dominity DOM element matching the specified query.
-
-- `$$el(qry)`: Finds and returns an array of dominity DOM elements matching the specified query.
-
-
-dominity DOM elemnts are are objects that have special methods and props to make it easy to style ,add events ,change attributes etc list of all methods are given as a table in the end of documentation
-
-Dominity DOM elements support chaining for all methods except for those meant to retrive data or child
-Dominity DOM elements are capable of being stored in a variable like any other object
-
+```
+> they are arguments so dont foreget the commas 
 
 #### Simplified Componentization
 
-Dominity allows us to create componets with ease by encapsulating Dominity code in a function. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component prop
+Dominity allows us to create componets with ease by encapsulating Dominity code in a function. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component prop, a dominity componenet is any function that returns elements made with dominity
 
 a simple button component 
 ```js
+import D from "dominity"
 
-function Button(text,color='red'){
-return el('button',text).style({
+function Button(text,color){
+return D.button(text).css({
 backgroundColor:color
 })
-//returning to allow further chaining
 }
 
-//addTo() is used to add the component where u want
-
-Button('click me','blue').addTo($el('#h')).onClick((s)=>{
-s.style({
-backgroundColor:'red'
-   })
+Button('click me','blue').on('click',(e)=>{
+  e.target.style.backgroundColor='lavander'
 })
 //here button changes color when u click it
 
-$('#s2').addChild(Button('click me','red'))
+D.h1(Button('click me','red'))
 
-//addchild can also be used to attach a component
+D.mount('body')
+
 
 ```
 
-#### Chaining DOM Elements
+#### Nesting DOM Elements
 
-Dominity enables chaining of DOM elements using `_el()` and `$end()` methods, allowing developers to efficiently construct complex DOM structures in a concise and readable manner.
 
 ```js
-el('div')._el('p', "Paragraph 1").$end()._el('p', "Paragraph 2").$end();
+div(p("paragraph 1") ,p("paragraph"))
 ```
-once use  the `el()` or `$el()` you are allowed to chain methods to it n number of times , think of it as opening an HTML tag.
-when u chain the `.$end()` it closes the tag according to analogy as long as u dont close it u can chain methods to modify, add events or style whatever
 
- you can create a child elemnt by chainig `._el()` which is same as `el()` but
- syntactically nicer 
 
 we recommend using intendation to make it look nice and legible
 ```js
-el('div').
-  _el('p','howdy').$end().
-  _el('button','join us').onClick(joinAction).$end()
-  _el('div').
-    _el('img','',{
-      alt:'profile pic',
-      src:'https://...'
-    }).$end()
-  .$end()
-.$end()
+import {div,p,button,img} from "dominity"
+
+div(
+  p('howdy'),
+button('join us').on('click',joinAction),
+ div(
+   img({
+       alt:'profile pic',
+       src:'https://...'
+     })
+ )
+)
+
+
 ```
-now that you've opened a child tag using `._el()` now methods u chain to it will work on the child to go back to working with parent close the child by chainig `$end()`
-
-in Dominity unlike HTML its not mandatory to close the tag at all if u dont want to go back to working with the parent element 
-
-technically when u chain `$end()` its returning the parent instance back to u so u can continue working on the parent again 
-so in above example last three `$end()` chain can be entirely omitted and it will still work
-
-> note: if u wish to return the element u are working on dont chain `$end()` to it as it returns its parent
 
 #### Reactivity System
 
-Dominity has a unique reactive system which isn't complex nor capable as the ones in other ones but its a neat way to make your dominity elements react to data and its tiny
-
+Dominity has a unique and simple reactivity system
 
 ```js
-let opinion = reactable('good').as('op');
+let opinion = state('good')
 
-el("h1","you are so {{op}}").reactTo(opinion)
+h1("you are so ",opinion) //you are so good
 
 ```
 
-function `reactable()` is used to create any litteral that is reactive it can be a integer,float,string,an object an array whats so ever ,it returns an object whixh stores the actual value in the `.value`
-property , you have to chain `.as()` to this to set up the name you'll be using in the text of elems
-
-in elements text string you can use double moustaches to surround the name u gave to reactable with `as()` and make that element attached to the reactable by using `reactTo(<reactableobject>)` pass in reactable stored in variable
+function `state()` is used to create any litteral that is reactive it can be a integer,float,string,an object an array whats so ever ,it returns an object whixh stores the actual value in the `.value`
 
 it carries over to child element if its on parent element as well
 
-in the above example whenever we change the value of opinion by using `.set()` method its change is reflected on the h1 tag
+in the above example whenever we change the value of opinion by assigning to `.value` property its change is reflected on the h1 tag
 
 ```js
-opinion.set('bad')
+opinion.value='bad'
 ```
 
 given below is an example of a simple counter using dominity
 
 ```js
 function Counter() {
-  let count = reactable(0).as('count');
+  let count = state(0);
 
-  el('div').
-    _el('p', "count: {{count}}").$end().
-    _el('button', "increment").onClick(() => {
-      count.set(count.value + 1);
-    }).$end().
-    _el('button', 'decrement').onClick(() => {
-      count.set(count.value - 1);
-    }).
-    $end().
-    reactTo(count);
+  rerurn div(
+    p("count:",count),
+    button("increment").on('click',() => {
+      count.value=count.value+1;
+    }),
+
+    button('decrement').on('click',() => {
+            count.value=count.value+1;
+    }),
+)
 }
 ```
-with mixed style it would look like this
 
-```html
-<div>
-<p id='disp'>count {{count}}</p>
-<button id="b1">increment</button>
-<button id="b2">decrement</button>
-</div>
-<script>
-let count=reactable(0).as('count')
-$el('#disp').reactTo(count)
-$el("#b1").onClick(s=>{count.set(count.value+1)})
-$el("#b2").onClick(s=>{count.set(count.value-1)})
- <script> 
-```
-
-as you can see in the html +js style more things need to have id and stuff to be identified
-
-reactables can be derived from other reactables which allows one to depend on others value
 ```js
 
-let name=reactable('vishal')
+let name=state('vishal')
 
-let nameAsList=reactable().deriveFrom(name,(value)=>{
-return Array.from(value)
+let nameAsList=derived(()=>{
+return Array.from(name.value)
 })
 
 ```
@@ -204,115 +159,122 @@ each time name updates its derived one will also update
 
 ```js
 function Dropdown(op=false){
-  let open=reactable(op)
+  let open=state(op)
   
-  return el('div').
-    _el('button','dropdown button').onClick(()=>{
-     open.set(!open.value)
+  return div(
+    button('dropdown button').on('click',()=>{
+     open.value=!open.value
     })
-    .$end().
-    _el('div','some very respectable dropdown content').showIf(open)
-  
+    ,
+
+    div('some very respectable dropdown content').showIf(open)
+  )
  
 }
 ```
 
-`showIf()` only renders the element if the reactable passed into it is truthy
-it hides otherwise
-
-it can also take in a condition but it wont be dynamic unless it is a reactable 
+`showIf()` only renders the element if the state passed into it is truthy
+it hides otherwise 
 
 #### filtering searchbar
 
 ```js
 function filterSearch(){
-  let search=reactable('')
+  let search=state('')
   let items=["potatoes","chicken","rice","bread"]
   
-  let filteredItems=reactable().deriveFrom(search,(val)=>{
-    return items.filter(i=>i.startsWith(val))
+  let filteredItems=derived(()=>{
+    return items.filter(i=>i.startsWith(search.value))
   })
 
-  return el('div').
-    _el('input','',{
-      placeHolder:'search in filter'
-      ,type:'search'
-    }).modal(search)
-    .$end().
-    _el('ul').loops(filteredItems,(item,parent)=>{
-        parent.
-          _el('li',item)
-      }).$end()
+return div(
+
+input({placeholder:'search in filter',
+type:'search'
+}).model(search),
+
+ul().forEvery(filterdItems,(item)=>{
+return li(item)
+})
+
+)
+
+  
   
 }
 
 ```
-the above example uses a derived reactable using`.deriveFrom()` method of a reactable
-to get a filtered list each time search value updates
+the above example uses a derived state using`.derived()`
 
-an interesting method of dominity search element is `.modal()` which allows you to actively update a reactable whenever its value changes and vice versa 
+an interesting method of dominity search element is `.model()` which allows you to actively update a state whenever its value changes and vice versa 
 
-here you can see the derived reactable filtered items is rendered as a list this is done by using `.loops()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and also the parent element for adding child elements
+here you can see the derived iterable state filtered items is rendered as a list this is done by using `.forEvery()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and element returned by the callback is added as child
 
 
 ### fully functional tasks app
 
 ```js
-let taskname=reactable('')
-let tasks=reactable(JSON.parse(localStorage.tasks))
-el('form')
-  ._el('fieldset','',{
+let taskname=state('')
+let tasks=state(JSON.parse(localStorage.tasks))
+
+
+
+
+form(
+  fieldset({
     role:'group'
-  }).
-    _el('input',{
+  },
+    input({
       type:'text'
       ,placeHolder:'enter task'
       ,id:'infield'
-    }).modal(taskname).$end().
-    _el('input','add task',{
+    }).model(taskname),
+
+    input('add task',{
       type:'submit'
-    }).$end()
-  .$end().
-  checkFor('submit',(e)=>{
+    })
+)
+ .on('submit',(e)=>{
     e.preventDefault()
     if(taskname.value !=''){
-      tasks.value.push({
+      tasks.value=[...tasks.value,{
         name:taskname.get(),
         done:false
-      })
-      tasks.update()
-      $el('#infield').value('')
+      }]
+      
+      document.querySelector('#infield').value=''
       
     }
   })
   
-el('ul').loops(tasks,(obj,p)=>{
-  p.
-    _el('li').
-      _el('input',{
+ul().forEvery(tasks,(obj)=>{
+  
+    return li(
+      input({
         type:'checkbox',
+        checked:obj.done?'true':'false'
        
-      }).attr(obj.done?('checked'):'unchecked','').checkFor('input',()=>{
+      }).on('input',()=>{
         obj.done=!obj.done
-        tasks.setProp('done',obj.done)
+        task.value.done=obj.done
         
-      })
+      }),
       
-      .$end().
-      _el('span',obj.name).style({
+      
+      span(obj.name).css({
         marginRight:'2rem',
         textDecoration:obj.done?'line-through':'none'
-      }).$end().
-      _el('button','x').class('outline').onClick((s)=>{
- tasks.set(tasks.value.filter(ob=>{
+      }),
+      button('x',{class:'outline'}).on('click',(s)=>{
+ tasks.value=[tasks.value.filter(ob=>{
    return ob!=obj
- }))
+ })]
 
       })
     
-})
+)})
   
-tasks.subscribe(()=>{
+effect(()=>{
    
  localStorage.tasks=JSON.stringify(tasks.value)
  
@@ -326,85 +288,7 @@ el('link','',{
 
 
 ```
-normally to make something like this it takes a lot of time and thinking but in dominity its all very simple `.subscribe()` method allows u to call a function when desired reactable is changed 
 
-
-
-### Utility Functions
-Dominity offers a few utility functions for common tasks, including copying text and generating random values.
-
-- `copy(txt)`: Copies the specified text to the clipboard of user 
-
-- `random(end, start = 0)`: Generates a random value within the specified range, it can also take just an array as argument and it will automatically chose a random element from that array
-
-- `range(s, e, increment = 1)`: Generates an array of numbers within the specified range. it can also generate an array of alphabets 
-
-```js
-copy("Hello, world!");
-let randomNumber = random(1, 100);
-let numberRange = range(1, 10);
-```
-
-### list of methods
-these are all the methods u can chain with any element retrived or created using Dominty functions
-[view full docs](https://atoms19.github.io/dominity.js/out/)
-methods included:
-
-| Method                  | Description                                                                                    |
-|-------------------------|------------------------------------------------------------------------------------------------|
-| `constructor(qry)`      | Creates a new `DominityElement` instance.                                                      |
-| `text(val=null)`        | Gets or sets the text content of the element.                                                  |
-| `html(val=null)`        | Gets or sets the HTML content of the element.                                                   |
-| `code(val=null)`        | Gets or sets the outer HTML content of the element.                                             |
-| `addText(val='')`       | Appends text content to the existing content of the element.                                    |
-| `addHtml(val='')`       | Appends HTML content to the existing content of the element.                                     |
-| `addCode(val='')`       | Appends outer HTML content to the existing content of the element.                               |
-| `insertHtml(placement,code)` | Inserts HTML content at the specified position relative to the element.                      |
-| `insertTxt(placement,txt)`   | Inserts text content at the specified position relative to the element.                         |
-| `style(prp, val=null)` | Gets or sets the CSS style property of the element.                                             |
-| `class()`               | Adds one or more classes to the element.                                                        |
-| `removeClass()`         | Removes one or more classes from the element.                                                   |
-| `toggleClass()`         | Toggles one or more classes on the element.                                                     |
-| `hasClass(cls)`         | Checks if the element has a specific class.                                                     |
-| `getClass(index = 0)`   | Gets the class name of the element at the specified index.                                       |
-| `attr(prp, val=null)`   | Gets or sets the attribute of the element.                                                      |
-| `hasAttr(val=null)`     | Checks if the element has the specified attribute.                                              |
-| `removeAttr()`          | Removes one or more attributes from the element.                                                |
-| `toggleAttr(atr, val="")` | Toggles the specified attribute on the element.                                                |
-| `value(val=null)`       | Gets or sets the value of the element (for form elements).                                      |
-| `checkFor(ev, cb, bub)` | Attaches an event listener to the element.                                                      |
-| `stopCheckFor(ev, func, bub)` | Removes an event listener from the element.                                                  |
-| `causeEvent(ev)`        | Dispatches a custom event on the element.                                                       |
-| `addTo(elm)`            | Adds the element to the specified parent element.                                               |
-| `insertTo(olb,placement)` | Inserts the element into the DOM at the specified position.                                    |
-| `remove()`              | Removes the element from the DOM.                                                              |
-| `addChild()`            | Appends one or more child elements to the element.                                              |
-| `insertChild(placement, nod)` | Inserts a child element at the specified position relative to the element.                  |
-| `removeChild()`         | Removes one or more child elements from the element.                                             |
-| `replaceChild(child, nod)` | Replaces a child element with another element.                                                 |
-| `getChild(t)`           | Gets the first child element matching the specified CSS selector.                                |
-| `getChildren(q)`        | Gets all child elements matching the specified CSS selector.                                     |
-| `child(pos)`            | Gets the child element at the specified index.                                                  |
-| `parent()`              | Gets the parent element of the current element.                                                 |
-| `next()`                | Gets the next sibling element.                                                                  |
-| `previous()`            | Gets the previous sibling element.                                                              |
-| `clone(condition = true)` | Clones the element.                                                                            |
-| `cloneContent(condition=true)` | Clones the content of the element.                                                           |
-| `closest(q)`            | Gets the closest ancestor element that matches the selector.                                     |
-| `contains(nod)`         | Checks if the element contains another node.                                                     |
-| `matches(q)`            | Checks if the element matches the given selector or element.                                      |
-| `hide()`                | Hides the element by setting its display property to "none".                                      |
-| `show(disp = "block")`  | Shows the element by setting its display property to the specified value.                         |
-| `toggleHide(ondisp, onhide)` | Toggles the visibility of the element.                                                        |
-| `focus(val = true)`     | Focuses or blurs the element.                                                                   |
-| `click()`               | Simulates a click event on the element.                                                          |
-| `scrollTo(s = true)`    | Scrolls the element into view.                                                                  |
-| `getScrollInfo()`       | Gets information about the element's scroll position.                                            |
-| `getSizeInfo()`         | Gets information about the element's size and position.                                          |
-| `fullScreen(val = true)`| Enters or exits full-screen mode.                                                               |
-| `onClick(cb)`           | Sets up an event listener for the "click" event.                                                 |
-| `enableHold(holdtime=0.5)` | Enables holding event on the element,you'll have to listen to this using checkFor.                                                         |
-| `enableSwipe(swipeDistance=50)` | Enables swipe event on the element, use checkFor same as above.                                                         |
 
 
 > you can still access orginal elements methods and props by using `<dominityElem>.elem.<orginal method>()`
