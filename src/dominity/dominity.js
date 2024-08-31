@@ -1068,4 +1068,5 @@ var startBatch = function() {
     $el,
     $$el
   };
-  
+  let effect=effect2
+  export default {...D,effect,derived,state,DominityReactive,$el,$$el,DominityRouter}
