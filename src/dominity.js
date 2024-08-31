@@ -862,7 +862,7 @@ var startBatch = function() {
         if (routeMap[key].getComponent !=undefined && typeof routeMap[key].getComponent == "function") {
           effect2(async ()=>{
               if(routeobj.viewKey.value){
-                let component=untracked(async()=>await routeMap[key].getComponent(this))
+                let component=await untracked(async()=>await routeMap[key].getComponent(this))
                 if(routeMap[key].layout!=undefined){
                   component=routeMap[key].layout(component)
                 }
