@@ -1,8 +1,8 @@
 ## Dominity js
 
-[view js docs](https://atoms19.github.io/dominity.js/js%20docs-outdated)
+[view docs](https://dominity.vercel.app)
 
-[visit documentation site](https://dominity-docs.vercel.app)
+[read handbook](https://dominity-docs.vercel.app)
 ### Introduction
 
 Dominity is a simple and lightweight JavaScript library designed to help u write html like syntax in js to make reusable reactive componets
@@ -12,14 +12,33 @@ its coupled with a client side router as well
  
 
 ### usage
-u can easily add dominity to your HTML file using a script tag or by our npm package
+u can start a new dominity project easily by importing straight from a cdn
 
-```html
-
-<script src="https://cdn.jsdelivr.net/gh/atoms19/dominity.js@latest/dist/dominity.min.js"></script>
+```js
+import D from "https://esm.sh/dominity@latest"
 ```
-its minified size is tiny and wont impact your performance at all unlike other bulky frameworks 
-so tiny infact its just little less than 5kib
+its final bundle size is just around 6-7 kb 
+
+## adding to an existing project
+
+you can add dominity to an existing project by installing it form npm and using it
+```
+npm i dominity@latest
+```
+```js
+import {state} from "dominity"
+```
+
+## using with vite
+to use with vite either create vinalla template and add the package manually or use this command to get a starter project setup 
+```
+npx degit https://github.com/atoms19/dominity-vite-app
+```
+cd into the project directory and do `npm i` and `npm run dev` to start developing 
+
+### mission 
+the syntax is very similiar to hyperscript , theres no learning curve here any function that returns this kinda hyperscript is viewed as a component , and calling the function and passing it as an argument creates compositioning of elements , theres reactivity sprinkled througout the project in the form of signals and helper methods to get things get going
+
 
 ### basics
 dominity gives u functions that create HTML elements thats it 
@@ -27,16 +46,17 @@ dominity gives u functions that create HTML elements thats it
 import {p,div} from "dominity"
 
 div("hello world",{class:"text-primary",id:'title'})
+
 p({class:'text-secondary'},`
 lorem ipsum dolor sit amet lorem ipsum dolor sit amet 
 lorem ipsum dolor sit amet 
-lorem ipsum dolor sit amet 
+lorem ipsum do
 `)
 
 ```
 as can see from the above example the function named div creates a division and paragraph elements and mounts it to the body
 
-objects with key value pairs passed in are considered attributes and strings are considered as text inside the element you can even pass in other `D.<tagname>` functions to create child elements
+objects with key value pairs passed in are considered attributes and strings are considered as text inside the element you can even pass in other hyperscript functions or components to create child elements
 
 ```js
 
@@ -58,9 +78,9 @@ a simple button component
 import {button,h1} from "dominity"
 
 function Button(text,color){
-return button(text).css({
-backgroundColor:color
-})
+  return button(text).css({
+  backgroundColor:color
+  })
 }
 
 Button('click me','blue').on('click',(e)=>{
@@ -286,7 +306,80 @@ el('link','',{
 
 ```
 
-
-
 > you can still access orginal elements methods and props by using `<dominityElem>.elem.<orginal method>()`
+
+## Routing in dominity 
+
+clientside routing is simpler than ever before with dominity's in built router 
+
+```js
+
+let r=new DominityRouter()
+r.setRoutes({
+"/home":{
+component:homeComponent(),
+isDefault:true //sets /home as default route on page load to /
+},
+
+"/marketing":{
+component:marketingComponent()
+},
+
+"/about":{
+component:aboutComponent()
+}
+
+})
+r.start() //initialises the routing 
+```
+
+
+use `r.Link` ie <router>.Link({href:''},....) as instead of anchor tags to trigger client side routing instead of browsers routing 
+
+use `r.getQueries` to get access to an object with all search queries passed in to the object
+
+dominity aids u in every way possible to create a fully fledged single page application ,its also ideal for progressive web apps 
+
+### using getComponents as routing mechanism 
+in dominity there exists 2 ways to route one is the above , above is more ideal in a scenerio where all your components and router are in the same file 
+in cases where your components and routes are in differernt files its better to use the api provided below again its very similiar just that u just pass in the function name instead of the whole function and use `getComponent` instead of `component`
+and also provide a root while the router is starting 
+```js
+import homeComponent from ....
+import marketingComponent form ...
+import aboutComponent from ....
+
+let r=new DominityRouter()
+r.setRoutes({
+"/home":{
+getComponent:homeComponent,
+isDefault:true //sets /home as default route on page load to /
+},
+
+"/marketing":{
+getComponent:marketingComponent
+},
+
+"/about":{
+getComponent:aboutComponent
+}
+
+})
+r.start(document.body) //initialises the routing at document.body must for this method
+```
+
+each component would recive the router instance as the parameter automatically , and u wont have to import the router to get `r.Link`,`r.queries` etc 
+
+```js
+
+export default function homeComponent(r){
+  return div(
+      r.Link({href:'/about'},"about page")
+  , r.Link({href:'/marketing'},"market page")
+  ....
+  )
+}
+
+
+```
 
