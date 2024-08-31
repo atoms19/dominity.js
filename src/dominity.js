@@ -646,7 +646,7 @@ var startBatch = function() {
     forEvery(list, callback) {
       let elemS = this;
       if (list instanceof DominityReactive) {
-        effect2(() => {
+        list._subscribe(() => {
           elemS.elem.innerHTML = "";
           list.value.forEach((item, count) => {
             let c=callback(item, count,elemS)
@@ -696,7 +696,7 @@ var startBatch = function() {
       }
       if (target instanceof DominityReactive) {
         if (options?.debounce == undefined && options?.throttle == undefined) {
-          effect2(() => {
+          target._subscribe(() => {
             if (!(target.value instanceof Array)) {
               this.elem[attr] = target.value;
             } else {
@@ -855,14 +855,14 @@ var startBatch = function() {
           routeMap[key].component.showIf(routeobj.viewKey);
         }
         if (routeMap[key].getComponent !=undefined && typeof routeMap[key].getComponent == "function") {
-          effect2(async ()=>{
+          routeobj._subscribe(async ()=>{
               if(routeobj.viewKey.value){
                 let component=await routeMap[key].getComponent(this)
                 if(routeMap[key].layout!=undefined){
                   component=routeMap[key].layout(component)
                 }
                 this.root.appendChild(component.withRef((r)=>{
-                  effect2(()=>{routeMap[key].componentLoaded=r
+                  routeobj._subscribe(()=>{routeMap[key].componentLoaded=r
                     if(routeMap[key].onLoad!=undefined){
                       routeMap[key].onLoad(r)
                     }
