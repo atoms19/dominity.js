@@ -496,6 +496,8 @@ var startBatch = function() {
   var DominityReactive = Signal;
   //------------------------------------------💓💓💓💓💓💓💓 thanks for scrolling ------------------------------------------------
 
+
+ 
 /**
  * 
  * a wrapper around html elements that enables dominity to function 
@@ -646,13 +648,16 @@ var startBatch = function() {
     forEvery(list, callback) {
       let elemS = this;
       if (list instanceof DominityReactive) {
-        list._subscribe(() => {
+        effect2(() => {
           elemS.elem.innerHTML = "";
           list.value.forEach((item, count) => {
+           untracked(()=>{
             let c=callback(item, count,elemS)
             if(c){
               c.addTo(this.elem)
             }
+          })
+            
           });
         });
         return this;
@@ -696,7 +701,7 @@ var startBatch = function() {
       }
       if (target instanceof DominityReactive) {
         if (options?.debounce == undefined && options?.throttle == undefined) {
-          target._subscribe(() => {
+          effect2(() => {
             if (!(target.value instanceof Array)) {
               this.elem[attr] = target.value;
             } else {
@@ -855,19 +860,19 @@ var startBatch = function() {
           routeMap[key].component.showIf(routeobj.viewKey);
         }
         if (routeMap[key].getComponent !=undefined && typeof routeMap[key].getComponent == "function") {
-          routeobj._subscribe(async ()=>{
+          effect2(async ()=>{
               if(routeobj.viewKey.value){
-                let component=await routeMap[key].getComponent(this)
+                let component=untracked(async()=>await routeMap[key].getComponent(this))
                 if(routeMap[key].layout!=undefined){
                   component=routeMap[key].layout(component)
                 }
                 this.root.appendChild(component.withRef((r)=>{
-                  routeobj._subscribe(()=>{routeMap[key].componentLoaded=r
+                  effect2(()=>{routeMap[key].componentLoaded=r
                     if(routeMap[key].onLoad!=undefined){
-                      routeMap[key].onLoad(r)
+                      untracked(()=>routeMap[key].onLoad(r))
                     }
                     if(this.onLoad!=undefined){
-                      this.onLoad()
+                      untracked(this.onLoad)
                     }
   
                   })
