@@ -1,0 +1,17 @@
+{
+  "name": "dominity",
+  "version": "6.1.0",
+  "description": "minimalistic javascript framewokr",
+  "main": "/src/dominity.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"npm run dev",
+    "build":"npm run build"
+  },
+  "keywords": [
+    "frontend",
+    "framework"
+  ],
+  "author": "atoms19",
+  "license": "MIT"
+}
