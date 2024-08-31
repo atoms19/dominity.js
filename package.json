@@ -1,8 +1,13 @@
 {
   "name": "dominity",
-  "version": "6.1.2",
-  "description": "minimalistic javascript framewokr",
-  "main": "/src/dominity.js",
+  "version": "6.1.5",
+  "description": "minimalistic javascript framework",
+  "main": "./src/dominity.js",
+  "exports":{
+    ".":{
+      "import":"./src/dominity.js"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,5 +16,8 @@
     "framework","minimalistic","client router"
   ],
   "author": "atoms19",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": "atoms19/dominity.js"
+
 }
+

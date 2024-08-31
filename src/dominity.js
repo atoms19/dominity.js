@@ -649,7 +649,10 @@ var startBatch = function() {
         effect2(() => {
           elemS.elem.innerHTML = "";
           list.value.forEach((item, count) => {
-            callback(item, count,elemS).addTo(this);
+            let c=callback(item, count,elemS)
+            if(c){
+              c.addTo(this.elem)
+            }
           });
         });
         return this;
@@ -782,6 +785,20 @@ var startBatch = function() {
       };
       return this;
     }
+    /**
+   * appends the element to another element provided 
+   * @param {DominityElement|HTMLELement} elm -parent element to add to
+   * @returns {this}
+   */
+    addTo(elm){ 
+      if(elm.dominityElem){ 
+        elm.addChild(this) 
+      }else{ 
+        elm.appendChild(this.elem) 
+      } 
+  
+      return this 
+    } 
     
   }
   /**sets up a client side router to handle page views */
