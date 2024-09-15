@@ -1,27 +1,27 @@
 ## Dominity js
 
-[view docs](https://dominity.vercel.app)
+[View Docs](https://dominity.vercel.app)
 
-[read handbook](https://dominity-docs.vercel.app)
+[Read Handbook](https://dominity-docs.vercel.app)
 ### Introduction
 
-Dominity is a simple and lightweight JavaScript library designed to help u write html like syntax in js to make reusable reactive componets
+Dominity is a simple and lightweight JavaScript library designed to help you write html like syntax in js to make reusable reactive components.
 
-its reactive hence allows you to automatically update the elements contents when the state changes
-its coupled with a client side router as well 
+Its reactive hence allows you to automatically update the elements contents when the state changes.
+Its coupled with a client side router as well. 
  
 
-### usage
-u can start a new dominity project easily by importing straight from a cdn
+### Usage
+You can start a new dominity project easily by importing straight from a cdn
 
 ```js
 import D from "https://esm.sh/dominity@latest"
 ```
-its final bundle size is just around 6-7 kb 
+Its final bundle size is just around 6-7 Kb. 
 
-## adding to an existing project
+## Adding to an Existing Project
 
-you can add dominity to an existing project by installing it form npm and using it
+You can add dominity to an existing project by installing it form npm and using it
 ```
 npm i dominity@latest
 ```
@@ -29,19 +29,19 @@ npm i dominity@latest
 import {state} from "dominity"
 ```
 
-## using with vite
-to use with vite either create vinalla template and add the package manually or use this command to get a starter project setup 
+## Using with Vite
+To use with vite either create vanilla template and add the package manually or use this command to get a starter project setup. 
 ```
 npx degit https://github.com/atoms19/dominity-vite-app
 ```
 cd into the project directory and do `npm i` and `npm run dev` to start developing 
 
-### mission 
-the syntax is very similiar to hyperscript , theres no learning curve here any function that returns this kinda hyperscript is viewed as a component , and calling the function and passing it as an argument creates compositioning of elements , theres reactivity sprinkled througout the project in the form of signals and helper methods to get things get going
+### Mission 
+The syntax is very similiar to <a href="https://hyperscript.org/">Hyperscript</a> therefore there is no learning curve here, any function that returns this kinda hyperscript is viewed as a component , and calling the function and passing it as an argument creates compositioning of elements , theres reactivity sprinkled througout the project in the form of signals and helper methods to get things going
 
 
-### basics
-dominity gives u functions that create HTML elements thats it 
+### Basics
+Dominity gives u functions that create HTML elements that's it 
 ```js
 import {p,div} from "dominity"
 
@@ -54,9 +54,9 @@ lorem ipsum do
 `)
 
 ```
-as can see from the above example the function named div creates a division and paragraph elements and mounts it to the body
+As can see from the above example the function named div creates a division and paragraph elements and mounts it to the body.
 
-objects with key value pairs passed in are considered attributes and strings are considered as text inside the element you can even pass in other hyperscript functions or components to create child elements
+Objects with key value pairs passed in, are considered attributes and strings are considered as text inside the element, you can even pass in other hyperscript functions or components to create child elements
 
 ```js
 
@@ -71,9 +71,9 @@ ul(
 
 #### Simplified Componentization
 
-Dominity allows us to create componets with ease by encapsulating Dominity code in a function. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component prop, a dominity componenet is any function that returns elements made with dominity
+Dominity allows us to create components with ease by encapsulating Dominity code in a function. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component prop, a dominity componenet is any function that returns elements made with dominity
 
-a simple button component 
+A simple button component 
 ```js
 import {button,h1} from "dominity"
 
@@ -101,7 +101,7 @@ div(p("paragraph 1") ,p("paragraph"))
 ```
 
 
-we recommend using intendation to make it look nice and legible
+We recommend using intendation to make it look nice and legible
 ```js
 import {div,p,button,img} from "dominity"
 
@@ -130,17 +130,17 @@ h1("you are so ",opinion) //you are so good
 
 ```
 
-function `state()` is used to create any litteral that is reactive it can be a integer,float,string,an object an array whats so ever ,it returns an object whixh stores the actual value in the `.value`
+Function `state()` is used to create any litteral that is reactive it can be a integer,float,string,an object an array whats so ever ,it returns an object which stores the actual value in the `.value`
 
-it carries over to child element if its on parent element as well
+It carries over to child element if its on parent element as well.
 
-in the above example whenever we change the value of opinion by assigning to `.value` property its change is reflected on the h1 tag
+In the above example whenever we change the value of opinion by assigning to `.value` property its change is reflected on the h1 tag.
 
 ```js
 opinion.value='bad'
 ```
 
-given below is an example of a simple counter using dominity
+Given below is an example of a simple counter using dominity.
 
 ```js
 function Counter() {
@@ -168,11 +168,11 @@ return Array.from(name.value)
 })
 
 ```
-each time name updates its derived one will also update 
+Each time name updates its derived value will also get updated automatically. 
 
-### examples
+### Examples
 
-#### a simple dropdown
+#### A simple Dropdown
 
 ```js
 function Dropdown(op=false){
@@ -190,8 +190,8 @@ function Dropdown(op=false){
 }
 ```
 
-`showIf()` only renders the element if the state passed into it is truthy
-it hides otherwise 
+`showIf()` only renders the element if the state passed into it is true.
+It hides otherwise. 
 
 #### filtering searchbar
 
@@ -221,14 +221,14 @@ return li(item)
 }
 
 ```
-the above example uses a derived state using`.derived()`
+The above example uses a derived state using`.derived()`.
 
-an interesting method of dominity search element is `.model()` which allows you to actively update a state whenever its value changes and vice versa 
+An interesting method of dominity search element is `.model()` which allows you to actively update a state whenever its value changes and vice versa. 
 
-here you can see the derived iterable state filtered items is rendered as a list this is done by using `.forEvery()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and element returned by the callback is added as child
+Here you can see the derived iterable state filtered items is rendered as a list this is done by using `.forEvery()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and element returned by the callback is added as child.
 
 
-### fully functional tasks app
+### Fully functional tasks app
 
 ```js
 let taskname=state('')
