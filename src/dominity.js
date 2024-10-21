@@ -443,8 +443,8 @@ var startBatch = function() {
     }
   };
   // dominityF.ts
-  function $el(qry) {
-    return new DominityElement(qry);
+  function $el(qry,...args) {
+    return el(DominityElement(qry).elem,...args);
   }
   function $$el(qry) {
     let elemArr = [];
@@ -454,7 +454,7 @@ var startBatch = function() {
     return elemArr;
   }
   var el = function(tagname, ...args) {
-    let elem = document.createElement(tagname);
+    let elem = typeof tagname== typeof "string" ? document.createElement(tagname) : tagname;
     let dElem = new DominityElement(elem);
     args.forEach((arg, index) => {
       if (typeof arg == "string") {
