@@ -444,7 +444,7 @@ var startBatch = function() {
   };
   // dominityF.ts
   function $el(qry,...args) {
-    return el(DominityElement(qry).elem,...args);
+    return el(new DominityElement(qry).elem,...args);
   }
   function $$el(qry) {
     let elemArr = [];
