@@ -503,7 +503,7 @@ var startBatch = function() {
  * a wrapper around html elements that enables dominity to function 
  * 
  */
-  export class DominityElement {
+   class DominityElement {
 
     /**
      * 
@@ -623,7 +623,7 @@ var startBatch = function() {
       return this 
 
     }
-
+    
 
     /**
      * used to attach events to an element
@@ -839,20 +839,20 @@ var startBatch = function() {
   child(index){
       return new DominityElement(this.elem.children[index])
   }
-
-  /**
+  
+/**
      * extends the current dominity element with the provided object
      * @param {object} extension -an object containing methods and properties to be added to the current dominity element
      * @returns {this}
 */
-extend(extension){
-  Object.assign(this,extension)
-  return this 
-}
+  extend(extension){
+    Object.assign(this,extension)
+    return this 
+  }
     
   }
   /**sets up a client side router to handle page views */
-  export class DominityRouter {
+   class DominityRouter {
     constructor() {
       this.routeMap = {};
       this.defaultPath = undefined;
@@ -1038,7 +1038,7 @@ extend(extension){
      * ```
    * @returns {this}
    */
-  export function lazy(path){
+   function lazy(path){
     return function(router){
       return import(path).then((s)=>s.default(router))
     }
@@ -1171,7 +1171,7 @@ extend(extension){
   
   
   
-  export var {
+ var {
     a,
     abbr,
     address,
@@ -1279,16 +1279,8 @@ extend(extension){
     ul,
     video,
     wbr,
-    slot
+    slot,
+    
   } = D;
-  export {
-    effect2 as effect,
-    derived,
-    state,
-    DominityReactive,
-    $el,
-    $$el,
-    el
-  };
-  
-  export default {...D,effect:(f)=>effect2(f),derived,state,DominityReactive,$el,$$el,el,DominityRouter,DominityElement}
+
+  window.D= {...D,effect:(f)=>effect2(f),derived,state,DominityReactive,$el,$$el,DominityRouter,DominityElement,el}
