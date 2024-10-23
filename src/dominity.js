@@ -624,7 +624,6 @@ var startBatch = function() {
 
     }
 
-
     /**
      * used to attach events to an element
      * @param {string} e -event name
