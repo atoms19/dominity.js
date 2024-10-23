@@ -822,8 +822,8 @@ var startBatch = function() {
    * @returns {this}
    */
     addTo(elm){ 
-      if(elm.dominityElem){ 
-        elm.addChild(this) 
+      if(elm instanceof DominityElement){ 
+        elm.elem.appendChild(this.elem) 
       }else{ 
         elm.appendChild(this.elem) 
       } 
