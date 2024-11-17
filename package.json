@@ -1,11 +1,11 @@
 {
   "name": "dominity",
-  "version": "6.2.7",
+  "version": "6.3.9",
   "description": "minimalistic javascript framework",
   "main": "./src/dominity.js",
-  "exports":{
-    ".":{
-      "import":"./src/dominity.js"
+  "exports": {
+    ".": {
+      "import": "./src/dominity.js"
     }
   },
   "scripts": {
@@ -13,11 +13,14 @@
   },
   "keywords": [
     "frontend",
-    "framework","minimalistic","client router"
+    "framework",
+    "minimalistic",
+    "client router"
   ],
   "author": "atoms19",
   "license": "MIT",
-  "repository": "atoms19/dominity.js"
-
+  "repository": "atoms19/dominity.js",
+  "dependencies": {
+    "@preact/signals-core": "^1.8.0"
+  }
 }
-

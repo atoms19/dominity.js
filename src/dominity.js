@@ -1,448 +1,11 @@
+import { computed, effect, Signal, signal,untracked } from "@preact/signals-core";
+
 // signalsF.ts-------------------------------------the following code is for states keep scrolling without paying attention till u see a heart emoji---------------
-var startBatch = function() {
-    batchDepth++;
-  };
-  var endBatch = function() {
-    if (batchDepth > 1) {
-      batchDepth--;
-      return;
-    }
-    let error;
-    let hasError = false;
-    while (batchedEffect !== undefined) {
-      let effect = batchedEffect;
-      batchedEffect = undefined;
-      batchIteration++;
-      while (effect !== undefined) {
-        const next = effect._nextBatchedEffect;
-        effect._nextBatchedEffect = undefined;
-        effect._flags &= ~NOTIFIED;
-        if (!(effect._flags & DISPOSED) && needsToRecompute(effect)) {
-          try {
-            effect._callback();
-          } catch (err) {
-            if (!hasError) {
-              error = err;
-              hasError = true;
-            }
-          }
-        }
-        effect = next;
-      }
-    }
-    batchIteration = 0;
-    batchDepth--;
-    if (hasError) {
-      throw error;
-    }
-  };
-  var batch = function(fn) {
-    if (batchDepth > 0) {
-      return fn();
-    }
-    startBatch();
-    try {
-      return fn();
-    } finally {
-      endBatch();
-    }
-  };
-  var untracked = function(fn) {
-    const prevContext = evalContext;
-    evalContext = undefined;
-    try {
-      return fn();
-    } finally {
-      evalContext = prevContext;
-    }
-  };
-  var addDependency = function(signal) {
-    if (evalContext === undefined) {
-      return;
-    }
-    let node = signal._node;
-    if (node === undefined || node._target !== evalContext) {
-      node = {
-        _version: 0,
-        _source: signal,
-        _prevSource: evalContext._sources,
-        _nextSource: undefined,
-        _target: evalContext,
-        _prevTarget: undefined,
-        _nextTarget: undefined,
-        _rollbackNode: node
-      };
-      if (evalContext._sources !== undefined) {
-        evalContext._sources._nextSource = node;
-      }
-      evalContext._sources = node;
-      signal._node = node;
-      if (evalContext._flags & TRACKING) {
-        signal._subscribe(node);
-      }
-      return node;
-    } else if (node._version === -1) {
-      node._version = 0;
-      if (node._nextSource !== undefined) {
-        node._nextSource._prevSource = node._prevSource;
-        if (node._prevSource !== undefined) {
-          node._prevSource._nextSource = node._nextSource;
-        }
-        node._prevSource = evalContext._sources;
-        node._nextSource = undefined;
-        evalContext._sources._nextSource = node;
-        evalContext._sources = node;
-      }
-      return node;
-    }
-    return;
-  };
-  var Signal = function(value) {
-    this._value = value;
-    this._version = 0;
-    this._node = undefined;
-    this._targets = undefined;
-  };
-  function signal(value) {
-    return new Signal(value);
-  }
-  var needsToRecompute = function(target) {
-    for (let node = target._sources;node !== undefined; node = node._nextSource) {
-      if (node._source._version !== node._version || !node._source._refresh() || node._source._version !== node._version) {
-        return true;
-      }
-    }
-    return false;
-  };
-  var prepareSources = function(target) {
-    for (let node = target._sources;node !== undefined; node = node._nextSource) {
-      const rollbackNode = node._source._node;
-      if (rollbackNode !== undefined) {
-        node._rollbackNode = rollbackNode;
-      }
-      node._source._node = node;
-      node._version = -1;
-      if (node._nextSource === undefined) {
-        target._sources = node;
-        break;
-      }
-    }
-  };
-  var cleanupSources = function(target) {
-    let node = target._sources;
-    let head = undefined;
-    while (node !== undefined) {
-      const prev = node._prevSource;
-      if (node._version === -1) {
-        node._source._unsubscribe(node);
-        if (prev !== undefined) {
-          prev._nextSource = node._nextSource;
-        }
-        if (node._nextSource !== undefined) {
-          node._nextSource._prevSource = prev;
-        }
-      } else {
-        head = node;
-      }
-      node._source._node = node._rollbackNode;
-      if (node._rollbackNode !== undefined) {
-        node._rollbackNode = undefined;
-      }
-      node = prev;
-    }
-    target._sources = head;
-  };
-  var Computed = function(fn) {
-    Signal.call(this, undefined);
-    this._fn = fn;
-    this._sources = undefined;
-    this._globalVersion = globalVersion - 1;
-    this._flags = OUTDATED;
-  };
-  var computed = function(fn) {
-    return new Computed(fn);
-  };
-  var cleanupEffect = function(effect) {
-    const cleanup = effect._cleanup;
-    effect._cleanup = undefined;
-    if (typeof cleanup === "function") {
-      startBatch();
-      const prevContext = evalContext;
-      evalContext = undefined;
-      try {
-        cleanup();
-      } catch (err) {
-        effect._flags &= ~RUNNING;
-        effect._flags |= DISPOSED;
-        disposeEffect(effect);
-        throw err;
-      } finally {
-        evalContext = prevContext;
-        endBatch();
-      }
-    }
-  };
-  var disposeEffect = function(effect) {
-    for (let node = effect._sources;node !== undefined; node = node._nextSource) {
-      node._source._unsubscribe(node);
-    }
-    effect._fn = undefined;
-    effect._sources = undefined;
-    cleanupEffect(effect);
-  };
-  var endEffect = function(prevContext) {
-    if (evalContext !== this) {
-      throw new Error("Out-of-order effect");
-    }
-    cleanupSources(this);
-    evalContext = prevContext;
-    this._flags &= ~RUNNING;
-    if (this._flags & DISPOSED) {
-      disposeEffect(this);
-    }
-    endBatch();
-  };
-  var Effect = function(fn) {
-    this._fn = fn;
-    this._cleanup = undefined;
-    this._sources = undefined;
-    this._nextBatchedEffect = undefined;
-    this._flags = TRACKING;
-  };
-  var effect = function(fn) {
-    const effect2 = new Effect(fn);
-    try {
-      effect2._callback();
-    } catch (err) {
-      effect2._dispose();
-      throw err;
-    }
-    return effect2._dispose.bind(effect2);
-  };
-  var BRAND_SYMBOL = Symbol.for("preact-signals");
-  var RUNNING = 1 << 0;
-  var NOTIFIED = 1 << 1;
-  var OUTDATED = 1 << 2;
-  var DISPOSED = 1 << 3;
-  var HAS_ERROR = 1 << 4;
-  var TRACKING = 1 << 5;
-  var evalContext = undefined;
-  var batchedEffect = undefined;
-  var batchDepth = 0;
-  var batchIteration = 0;
-  var globalVersion = 0;
-  Signal.prototype.brand = BRAND_SYMBOL;
-  Signal.prototype._refresh = function() {
-    return true;
-  };
-  Signal.prototype._subscribe = function(node) {
-    if (this._targets !== node && node._prevTarget === undefined) {
-      node._nextTarget = this._targets;
-      if (this._targets !== undefined) {
-        this._targets._prevTarget = node;
-      }
-      this._targets = node;
-    }
-  };
-  Signal.prototype._unsubscribe = function(node) {
-    if (this._targets !== undefined) {
-      const prev = node._prevTarget;
-      const next = node._nextTarget;
-      if (prev !== undefined) {
-        prev._nextTarget = next;
-        node._prevTarget = undefined;
-      }
-      if (next !== undefined) {
-        next._prevTarget = prev;
-        node._nextTarget = undefined;
-      }
-      if (node === this._targets) {
-        this._targets = next;
-      }
-    }
-  };
-  Signal.prototype.subscribe = function(fn) {
-    return effect(() => {
-      const value = this.value;
-      const prevContext = evalContext;
-      evalContext = undefined;
-      try {
-        fn(value);
-      } finally {
-        evalContext = prevContext;
-      }
-    });
-  };
-  Signal.prototype.valueOf = function() {
-    return this.value;
-  };
-  Signal.prototype.toString = function() {
-    return this.value + "";
-  };
-  Signal.prototype.toJSON = function() {
-    return this.value;
-  };
-  Signal.prototype.peek = function() {
-    const prevContext = evalContext;
-    evalContext = undefined;
-    try {
-      return this.value;
-    } finally {
-      evalContext = prevContext;
-    }
-  };
-  Object.defineProperty(Signal.prototype, "value", {
-    get() {
-      const node = addDependency(this);
-      if (node !== undefined) {
-        node._version = this._version;
-      }
-      return this._value;
-    },
-    set(value) {
-      if (value !== this._value) {
-        if (batchIteration > 100) {
-          throw new Error("Cycle detected");
-        }
-        this._value = value;
-        this._version++;
-        globalVersion++;
-        startBatch();
-        try {
-          for (let node = this._targets;node !== undefined; node = node._nextTarget) {
-            node._target._notify();
-          }
-        } finally {
-          endBatch();
-        }
-      }
-    }
-  });
-  Computed.prototype = new Signal;
-  Computed.prototype._refresh = function() {
-    this._flags &= ~NOTIFIED;
-    if (this._flags & RUNNING) {
-      return false;
-    }
-    if ((this._flags & (OUTDATED | TRACKING)) === TRACKING) {
-      return true;
-    }
-    this._flags &= ~OUTDATED;
-    if (this._globalVersion === globalVersion) {
-      return true;
-    }
-    this._globalVersion = globalVersion;
-    this._flags |= RUNNING;
-    if (this._version > 0 && !needsToRecompute(this)) {
-      this._flags &= ~RUNNING;
-      return true;
-    }
-    const prevContext = evalContext;
-    try {
-      prepareSources(this);
-      evalContext = this;
-      const value = this._fn();
-      if (this._flags & HAS_ERROR || this._value !== value || this._version === 0) {
-        this._value = value;
-        this._flags &= ~HAS_ERROR;
-        this._version++;
-      }
-    } catch (err) {
-      this._value = err;
-      this._flags |= HAS_ERROR;
-      this._version++;
-    }
-    evalContext = prevContext;
-    cleanupSources(this);
-    this._flags &= ~RUNNING;
-    return true;
-  };
-  Computed.prototype._subscribe = function(node) {
-    if (this._targets === undefined) {
-      this._flags |= OUTDATED | TRACKING;
-      for (let node2 = this._sources;node2 !== undefined; node2 = node2._nextSource) {
-        node2._source._subscribe(node2);
-      }
-    }
-    Signal.prototype._subscribe.call(this, node);
-  };
-  Computed.prototype._unsubscribe = function(node) {
-    if (this._targets !== undefined) {
-      Signal.prototype._unsubscribe.call(this, node);
-      if (this._targets === undefined) {
-        this._flags &= ~TRACKING;
-        for (let node2 = this._sources;node2 !== undefined; node2 = node2._nextSource) {
-          node2._source._unsubscribe(node2);
-        }
-      }
-    }
-  };
-  Computed.prototype._notify = function() {
-    if (!(this._flags & NOTIFIED)) {
-      this._flags |= OUTDATED | NOTIFIED;
-      for (let node = this._targets;node !== undefined; node = node._nextTarget) {
-        node._target._notify();
-      }
-    }
-  };
-  Object.defineProperty(Computed.prototype, "value", {
-    get() {
-      if (this._flags & RUNNING) {
-        throw new Error("Cycle detected");
-      }
-      const node = addDependency(this);
-      this._refresh();
-      if (node !== undefined) {
-        node._version = this._version;
-      }
-      if (this._flags & HAS_ERROR) {
-        throw this._value;
-      }
-      return this._value;
-    }
-  });
-  Effect.prototype._callback = function() {
-    const finish = this._start();
-    try {
-      if (this._flags & DISPOSED)
-        return;
-      if (this._fn === undefined)
-        return;
-      const cleanup = this._fn();
-      if (typeof cleanup === "function") {
-        this._cleanup = cleanup;
-      }
-    } finally {
-      finish();
-    }
-  };
-  Effect.prototype._start = function() {
-    if (this._flags & RUNNING) {
-      throw new Error("Cycle detected");
-    }
-    this._flags |= RUNNING;
-    this._flags &= ~DISPOSED;
-    cleanupEffect(this);
-    prepareSources(this);
-    startBatch();
-    const prevContext = evalContext;
-    evalContext = this;
-    return endEffect.bind(this, prevContext);
-  };
-  Effect.prototype._notify = function() {
-    if (!(this._flags & NOTIFIED)) {
-      this._flags |= NOTIFIED;
-      this._nextBatchedEffect = batchedEffect;
-      batchedEffect = this;
-    }
-  };
-  Effect.prototype._dispose = function() {
-    this._flags |= DISPOSED;
-    if (!(this._flags & RUNNING)) {
-      disposeEffect(this);
-    }
-  };
-  // dominityF.ts
+  var state = signal;
+  var derived = computed;
+  var DominityReactive = Signal;
+
+
   function $el(qry,...args) {
     return el(new DominityElement(qry).elem,...args);
   }
@@ -462,14 +25,14 @@ var startBatch = function() {
         elem.appendChild(textNode);
       } else if (typeof arg == "function" && typeof arg() == "string") {
         let textNode = document.createTextNode(arg());
-        effect2(() => {
+        effect(() => {
           textNode.data = arg();
         });
         elem.appendChild(textNode);
       } else if (arg instanceof DominityReactive) {
         let textNode = document.createTextNode(arg.value);
         elem.appendChild(textNode);
-        effect2(() => {
+        effect(() => {
           textNode.data = arg.value;
         });
       } else if (arg instanceof DominityElement) {
@@ -490,14 +53,7 @@ var startBatch = function() {
     });
     return dElem;
   };
-  var effect2 = effect; //this is a bundler problem it gets renamed but in the final export its effect itself not effect2
-  var state = signal;
-  var derived = computed;
-  var DominityReactive = Signal;
-  //------------------------------------------💓💓💓💓💓💓💓 thanks for scrolling ------------------------------------------------
 
-
- 
 /**
  * 
  * a wrapper around html elements that enables dominity to function 
@@ -518,7 +74,7 @@ var startBatch = function() {
       }
       if (this.elem == null) {
         console.error(`DominityError: element of query '${qry}'  NOT  FOUND `);
-        return;
+        return false;
       }
     }
     /**
@@ -531,7 +87,7 @@ var startBatch = function() {
         return this.elem.innerHTML;
       } else {
         if (typeof val == "function") {
-          effect2(() => {
+          effect(() => {
             this.html(val());
           });
         } else {
@@ -558,11 +114,59 @@ var startBatch = function() {
         Object.assign(this.elem.style, prp);
         return this;
       } else if (typeof prp == "function") {
-        effect2(() => {
+        effect(() => {
           this.css(prp());
         });
         return this;
       }
+    }
+
+    addClass(...classnames){
+
+      this.elem.classList.add(...classnames)
+      return this 
+
+    }
+
+    removeClass(...classnames){
+
+      this.elem.classList.remove(...classnames)
+      return this 
+
+    }
+
+    removeAttr(...attrs){
+      this.elem.removeAttribute(...attrs)
+      return this 
+    }
+
+    
+    /**
+     * applies a stylesheet to the element
+     * @param {string} cssStringy -the css string, $this is replaced with a random class name
+     * @returns {this}
+     */
+    $css(cssStringy,classRetriever){
+      if(cssStringy instanceof DominityReactive) {
+        this.elem.classList.add(cssStringy.value)
+        return this 
+      }
+      let randomClassName='d-styler-'+Math.floor(Math.random()*1000+Date.now())
+      let parsed=cssStringy.replaceAll('$this','.'+randomClassName)
+      if(!document.querySelector('#dominity-style-injected')){
+        let s=document.createElement("style")
+        s.id="#dominity-style-injected"
+        s.innerHTML+=parsed
+        document.body.append(s)
+      }else{
+      document.querySelector("#dominity-style-injected").innerHTML+=parsed
+      }
+      this.elem.classList.add(randomClassName)
+      
+      if(classRetriever!=undefined && classRetriever instanceof DominityReactive){
+        classRetriever.value=randomClassName
+      }
+      return this
     }
     /**
      * used to add attributes to an element
@@ -583,14 +187,14 @@ var startBatch = function() {
         let vals = Object.values(prp);
         attrs.forEach((p, i) => {
         if(vals[i] instanceof DominityReactive){
-          effect2(()=>{
+          effect(()=>{
             this.attr(p,vals[i].value)
           })
   
         }else if (typeof vals[i] != "function") {
               this.attr(p, vals[i]);
         } else if (typeof vals[i] == "function") {
-            effect2(() => {
+            effect(() => {
               this.attr(p, vals[i]());
             });
           }
@@ -599,6 +203,9 @@ var startBatch = function() {
       }
     }
 
+
+    
+
     /**
      * binds a state with a class
      * @param {DominityReactive} state  
@@ -606,7 +213,7 @@ var startBatch = function() {
      * @param {string} falseclass -classes to be added when state is false seperated by space
      */
     bindClass(state,trueclass,falseclass){
-      effect2(()=>{
+      effect(()=>{
         if(state.value){
           this.elem.classList.add(...trueclass.split(' '))
           if(falseclass!=undefined){
@@ -617,6 +224,21 @@ var startBatch = function() {
           if(falseclass!=undefined){
             this.elem.classList.add(...falseclass.split(' '))
           }
+        }
+      })
+
+      return this 
+
+    }
+
+
+    bindAttr(state,attr,value=''){
+      effect(()=>{
+        if(state.value){
+          this.attr(attr,value)
+          
+        }else{
+          this.removeAttr(attr)
         }
       })
 
@@ -649,12 +271,12 @@ var startBatch = function() {
     showIf(expression) {
       let storedDisplay = this.css("display") != "none" ? this.css("display") : "block";
       if (typeof expression == "function") {
-        effect2(() => {
+        effect(() => {
           this.showIf(expression());
         });
         return this;
       } else if (expression instanceof DominityReactive) {
-        effect2(() => {
+        effect(() => {
           this.showIf(expression.value);
         });
       } else if (expression) {
@@ -674,7 +296,7 @@ var startBatch = function() {
     forEvery(list, callback) {
       let elemS = this;
       if (list instanceof DominityReactive) {
-        effect2(() => {
+        effect(() => {
           elemS.elem.innerHTML = "";
           list.value.forEach((item, count) => {
            untracked(()=>{
@@ -727,7 +349,7 @@ var startBatch = function() {
       }
       if (target instanceof DominityReactive) {
         if (options?.debounce == undefined && options?.throttle == undefined) {
-          effect2(() => {
+          effect(() => {
             if (!(target.value instanceof Array)) {
               this.elem[attr] = target.value;
             } else {
@@ -904,14 +526,14 @@ extend(extension){
           routeMap[key].component.showIf(routeobj.viewKey);
         }
         if (routeMap[key].getComponent !=undefined && typeof routeMap[key].getComponent == "function") {
-          effect2(async ()=>{
+          effect(async ()=>{
               if(routeobj.viewKey.value){
                 let component=await untracked(async()=>await routeMap[key].getComponent(this))
                 if(routeMap[key].layout!=undefined){
                   component=routeMap[key].layout(component)
                 }
                 this.root.appendChild(component.withRef((r)=>{
-                  effect2(()=>{routeMap[key].componentLoaded=r
+                  effect(()=>{routeMap[key].componentLoaded=r
                     if(routeMap[key].onLoad!=undefined){
                       untracked(()=>routeMap[key].onLoad(r))
                     }
@@ -1043,6 +665,57 @@ extend(extension){
     }
   
   }
+
+class DominityStore{
+  constructor (name,storeData){
+    this._values={}
+    Object.keys(storeData.states).forEach((key)=>{
+      this._values[key]=state(storeData.states[key])
+    })
+
+    Object.keys(storeData.actions).forEach((key)=>{
+      this[key]=()=>{
+        storeData.actions[key](this._values,this)
+      }
+    })
+
+    Object.keys(storeData.getters).forEach((key)=>{
+        this[key]=derived(storeData.getters[key])
+    })
+    
+  }
+
+  getRef(ref){
+    return derived(()=>this._values[ref].value)
+  }
+  getEditableRef(ref){
+    let refer=derived(()=>this._values[ref].value)
+    effect(()=>{
+      this._values[ref].value=refer.value
+    })
+    return refer
+  }
+
+  getRefs(obj){
+    if(obj && obj.edit) return this._values
+    let refobj={}
+    for (const key in this._values){
+        refobj[key]=derived(()=>this._values[key].value)
+    }
+    return refobj
+  }
+ 
+    } 
+  
+
+  
+
+
+function createStore(name,storeData){
+    return new DominityStore(name,storeData)
+}
+
+
   
   
   var htmlTags = [
@@ -1167,6 +840,8 @@ extend(extension){
     root: document.body
   });
   
+
+  
   
   
   
@@ -1281,7 +956,9 @@ extend(extension){
     slot
   } = D;
   export {
-    effect2 as effect,
+    createStore,
+    DominityStore,
+    effect,
     derived,
     state,
     DominityReactive,
@@ -1290,4 +967,4 @@ extend(extension){
     el
   };
   
-  export default {...D,effect:(f)=>effect2(f),derived,state,DominityReactive,$el,$$el,el,DominityRouter,DominityElement}
+  export default {...D,effect,createStore,derived,state,DominityReactive,$el,$$el,el,DominityRouter,DominityElement}
