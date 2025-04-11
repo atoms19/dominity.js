@@ -1,6 +1,6 @@
 {
   "name": "dominity",
-  "version": "6.3.9",
+  "version": "6.4.1",
   "description": "minimalistic javascript framework",
   "main": "./src/dominity.js",
   "exports": {
