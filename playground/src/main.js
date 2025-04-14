@@ -3,7 +3,6 @@ import d from "dominity"
 console.log("working")
 
 let content=d.state('')
-let token='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'
 function loadPage(url){
 
     d.effect(async()=>{
