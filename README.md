@@ -1,427 +1,96 @@
 ## Dominity js
 
+![DominityBanner](./assets/banner.svg)
+
 [![npm Version](https://img.shields.io/npm/v/dominity.svg)](https://www.npmjs.com/package/dominity) &nbsp;
 [![npm Downloads](https://img.shields.io/npm/dm/dominity.svg)](https://www.npmjs.com/package/dominity) &nbsp;
 
-- purely clientside SPA focused microframework
-- no virtual DOM , instant reactivity 
-- no build step required
-- no JSX
-- lightweight 
+dominity is a minimalist frontend framework to make data heavy single page applications(SPA) which feels snappy and fast. It is performant and lightweight and needs no build step making development of SPA's effortless 
 
+dominity has everything what you need from a  powerful clientside router to a state Mangement solution.
+and as cherry on top many plugins to extend its functionality formvalidation , tables and more 
+
+## features
+- simple and intutive api 
+- you dont need a buildstep
+- lightweight
+- reactive with signals
+- no virtual dom
+- no uncecessary naming conventions
+- builtin clientside routing 
+- builtin state management
 
 
 [view docs](https://dominity.vercel.app)
-[read handbook](https://dominity-docs.vercel.app)
-### Introduction
-
-Dominity is a simple and lightweight JavaScript library designed to help u write html like syntax in js to make reusable reactive componets
-
-its reactive hence allows you to automatically update the elements contents when the state changes
-its coupled with a client side router as well 
- 
-
-### usage
-u can start a new dominity project easily by importing straight from a cdn
+![Dominity Counter Example](./assets/glance.png) 
 
 ```js
-import D from "https://esm.sh/dominity@latest"
-```
-its final bundle size is just around 6-7 kb 
+import {button,state,derived} from "dominity"
 
-## adding to an existing project
+function counter() {
+  const count = state(0);
+  const doubleCount = derived(() => count.value * 2);
+  
 
-you can add dominity to an existing project by installing it form npm and using it
-```
-npm i dominity@latest
-```
-```js
-import {state} from "dominity"
-```
-
-## using with vite
-to use with vite either create vinalla template and add the package manually or use this command to get a starter project setup 
-```
-npx degit https://github.com/atoms19/dominity-vite-app
-```
-cd into the project directory and do `npm i` and `npm run dev` to start developing 
-
-### mission 
-the syntax is very similiar to hyperscript , theres no learning curve here any function that returns this kinda hyperscript is viewed as a component , and calling the function and passing it as an argument creates compositioning of elements , theres reactivity sprinkled througout the project in the form of signals and helper methods to get things get going
-
-
-### basics
-dominity gives u functions that create HTML elements thats it 
-```js
-import {p,div} from "dominity"
-
-div("hello world",{class:"text-primary",id:'title'})
-
-p({class:'text-secondary'},`
-lorem ipsum dolor sit amet lorem ipsum dolor sit amet 
-lorem ipsum dolor sit amet 
-lorem ipsum do
-`)
-
-```
-as can see from the above example the function named div creates a division and paragraph elements and mounts it to the body
-
-objects with key value pairs passed in are considered attributes and strings are considered as text inside the element you can even pass in other hyperscript functions or components to create child elements
-
-```js
-
-ul(
- li(a('yo',{href:'#'})),
- li(a('yo',{href:'#'})),
- li(a('yo',{href:'#'})),
-)
-
-```
-> they are arguments so dont foreget the commas 
-
-#### Simplified Componentization
-
-Dominity allows us to create componets with ease by encapsulating Dominity code in a function. This approach allows developers to create modular and maintainable code structures with ease, utilizing function parameters as component prop, a dominity componenet is any function that returns elements made with dominity
-
-a simple button component 
-```js
-import {button,h1} from "dominity"
-
-function Button(text,color){
-  return button(text).css({
-  backgroundColor:color
+  return button("count is :",doubleCount).on("click",()=>{
+    count.value++
   })
 }
 
-Button('click me','blue').on('click',(e)=>{
-  e.target.style.backgroundColor='lavander'
-})
-//here button changes color when u click it
-
-h1(Button('click me','red'))
-
-
+Counter().addTo(document.body);
 ```
 
-#### Nesting DOM Elements
+## getting started
 
-
+use directly via cdn or install form npm 
 ```js
-div(p("paragraph 1") ,p("paragraph"))
+import d from "https://esm.sh/dominity
 ```
-
-
-we recommend using intendation to make it look nice and legible
-```js
-import {div,p,button,img} from "dominity"
-
-div(
-  p('howdy'),
-button('join us').on('click',joinAction),
- div(
-   img({
-       alt:'profile pic',
-       src:'https://...'
-     })
- )
-)
-
-
+or 
+```bash
+npm i dominity
 ```
+recommened to use vite with dominity 
 
-#### Reactivity System
+## building ui with dominity 
+instead of making html tags , dominity provides functions to create elements , functions are more flexible as they can be rerun multiple times and you can add any sort of logic to them 
+nesting functions allows you to create complex uis 
 
-Dominity has a unique and simple reactivity system
+```html
+<main>
+  <h1>hello world</h1>
+  <button id="btn">click me</button>
+</main>
 
-```js
-let opinion = state('good')
-
-h1("you are so ",opinion) //you are so good
-
-```
-
-function `state()` is used to create any litteral that is reactive it can be a integer,float,string,an object an array whats so ever ,it returns an object whixh stores the actual value in the `.value`
-
-it carries over to child element if its on parent element as well
-
-in the above example whenever we change the value of opinion by assigning to `.value` property its change is reflected on the h1 tag
-
-```js
-opinion.value='bad'
-```
-
-given below is an example of a simple counter using dominity
-
-```js
-function Counter() {
-  let count = state(0);
-
-  rerurn div(
-    p("count:",count),
-    button("increment").on('click',() => {
-      count.value=count.value+1;
-    }),
-
-    button('decrement').on('click',() => {
-            count.value=count.value+1;
-    }),
-)
-}
-```
-
-```js
-
-let name=state('vishal')
-
-let nameAsList=derived(()=>{
-return Array.from(name.value)
-})
-
-```
-each time name updates its derived one will also update 
-
-### examples
-
-#### a simple dropdown
-
-```js
-function Dropdown(op=false){
-  let open=state(op)
-  
-  return div(
-    button('dropdown button').on('click',()=>{
-     open.value=!open.value
-    })
-    ,
-
-    div('some very respectable dropdown content').showIf(open)
-  )
- 
-}
-```
-
-`showIf()` only renders the element if the state passed into it is truthy
-it hides otherwise 
-
-#### filtering searchbar
-
-```js
-function filterSearch(){
-  let search=state('')
-  let items=["potatoes","chicken","rice","bread"]
-  
-  let filteredItems=derived(()=>{
-    return items.filter(i=>i.startsWith(search.value))
+<script>
+  document.querySelector("#btn").addEventListener("click",()=>{
+    alert("hello world")
   })
-
-return div(
-
-input({placeholder:'search in filter',
-type:'search'
-}).model(search),
-
-ul().forEvery(filterdItems,(item)=>{
-return li(item)
-})
-
-)
-
-  
-  
-}
-
+</script>
 ```
-the above example uses a derived state using`.derived()`
-
-an interesting method of dominity search element is `.model()` which allows you to actively update a state whenever its value changes and vice versa 
-
-here you can see the derived iterable state filtered items is rendered as a list this is done by using `.forEvery()` method it accepts a reactable and a callback from the callback function you can access the value of each item in array and element returned by the callback is added as child
-
-
-### fully functional tasks app
 
 ```js
-let taskname=state('')
-let tasks=state(JSON.parse(localStorage.tasks))
+import {h1,button,main} from "dominity"
 
-
-
-
-form(
-  fieldset({
-    role:'group'
-  },
-    input({
-      type:'text'
-      ,placeHolder:'enter task'
-      ,id:'infield'
-    }).model(taskname),
-
-    input('add task',{
-      type:'submit'
-    })
-)
- .on('submit',(e)=>{
-    e.preventDefault()
-    if(taskname.value !=''){
-      tasks.value=[...tasks.value,{
-        name:taskname.get(),
-        done:false
-      }]
-      
-      document.querySelector('#infield').value=''
-      
-    }
+let app=main(
+  h1("hello world"),
+  button("click me").on("click",()=>{
+    alert("hello world")
   })
-  
-ul().forEvery(tasks,(obj)=>{
-  
-    return li(
-      input({
-        type:'checkbox',
-        checked:obj.done?'true':'false'
-       
-      }).on('input',()=>{
-        obj.done=!obj.done
-        task.value.done=obj.done
-        
-      }),
-      
-      
-      span(obj.name).css({
-        marginRight:'2rem',
-        textDecoration:obj.done?'line-through':'none'
-      }),
-      button('x',{class:'outline'}).on('click',(s)=>{
- tasks.value=[tasks.value.filter(ob=>{
-   return ob!=obj
- })]
+)
 
-      })
-    
-)})
-  
-effect(()=>{
-   
- localStorage.tasks=JSON.stringify(tasks.value)
- 
-})
-
-/*optional link to styleing cause it actually looks horrible without styling*/
-link({
-  href:'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css'
-  ,rel:'stylesheet'
-})
-
-
+app.addTo(document.body)
 ```
+this makes for easier ui layouts where the form and function are closely coupled together with semantics 
 
-> you can still access orginal elements methods and props by using `<dominityElem>.elem.<orginal method>()`
+[read more at docs](https://dominity.vercel.app)
 
-## Routing in dominity 
-
-clientside routing is simpler than ever before with dominity's in built router 
-
-```js
-
-let r=new DominityRouter()
-r.setRoutes({
-"/home":{
-component:homeComponent(),
-isDefault:true //sets /home as default route on page load to /
-},
-
-"/marketing":{
-component:marketingComponent()
-},
-
-"/about":{
-component:aboutComponent()
-}
-
-})
-r.start() //initialises the routing 
-```
-
-
-use `r.Link` ie <router>.Link({href:''},....) as instead of anchor tags to trigger client side routing instead of browsers routing 
-
-use `r.getQueries` to get access to an object with all search queries passed in to the object
-
-dominity aids u in every way possible to create a fully fledged single page application ,its also ideal for progressive web apps 
-
-### using getComponents as routing mechanism 
-in dominity there exists 2 ways to route one is the above , above is more ideal in a scenerio where all your components and router are in the same file 
-in cases where your components and routes are in differernt files its better to use the api provided below again its very similiar just that u just pass in the function name instead of the whole function and use `getComponent` instead of `component`
-and also provide a root while the router is starting 
-```js
-import homeComponent from ....
-import marketingComponent form ...
-import aboutComponent from ....
-
-let r=new DominityRouter()
-r.setRoutes({
-"/home":{
-getComponent:homeComponent,
-isDefault:true //sets /home as default route on page load to /
-},
-
-"/marketing":{
-getComponent:marketingComponent
-},
-
-"/about":{
-getComponent:aboutComponent
-}
-
-})
-r.start(document.body) //initialises the routing at document.body must for this method
-```
-
-each component would recive the router instance as the parameter automatically , and u wont have to import the router to get `r.Link`,`r.queries` etc 
-
-```js
-
-export default function homeComponent(r){
-  return div(
-      r.Link({href:'/about'},"about page")
-  , r.Link({href:'/marketing'},"market page")
-  ....
-  )
-}
-
-
-```
-#### onLoad method
-you can trigger a custom function on each routematch on router using onLoad
-
-```
-r=new DominityRouter()
-
-r.onLoad=()=>{
-
-    //anything u wish to run 
-}
-```
-
-### lazy loading components (beta)
-```js
-
-"/home":{
-
-    getComponent:lazy('./pathTocomponent...')
-}
-
-
-```
-this is very much in beta and lazy is a function youll have to design yourself for now (copy paste to your project utils or smthn)
-```js
-export function lazy(path){
-  return function(router){
-    return import(path).then((s)=>s.default(router))
-  }
-
-}
-```
-there seems to be a flashing white issue between page loads on lazy loading , will be fixed soon
+## contribution guide
+1. Fork the repository
+2. Clone the forked repository
+3. Install dependencies
+4. the sorce code is in `src` folder , you can see the `z_old_dominity.js` file to gain an idea of how the code looks , the library is split into multiple files so work on the part u need one at a time 
+5. test out the changes at `playground` (live test environment ,use test.js) cd there and and run dev 
+6. submit a pull request
+7. will be checked and merged
 
