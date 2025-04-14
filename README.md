@@ -1,7 +1,17 @@
 ## Dominity js
 
-[view docs](https://dominity.vercel.app)
+[![npm Version](https://img.shields.io/npm/v/dominity.svg)](https://www.npmjs.com/package/dominity) &nbsp;
+[![npm Downloads](https://img.shields.io/npm/dm/dominity.svg)](https://www.npmjs.com/package/dominity) &nbsp;
 
+- purely clientside SPA focused microframework
+- no virtual DOM , instant reactivity 
+- no build step required
+- no JSX
+- lightweight 
+
+
+
+[view docs](https://dominity.vercel.app)
 [read handbook](https://dominity-docs.vercel.app)
 ### Introduction
 

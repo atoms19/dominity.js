@@ -1,11 +1,11 @@
 {
   "name": "dominity",
-  "version": "6.4.1",
+  "version": "6.4.2",
   "description": "minimalistic javascript framework",
-  "main": "./src/dominity.js",
+  "main": "./src/index.js",
   "exports": {
     ".": {
-      "import": "./src/dominity.js"
+      "import": "./src/index.js"
     }
   },
   "scripts": {

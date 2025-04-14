@@ -1,3 +1,5 @@
+
+
 import {
    computed,
    effect,
@@ -6,10 +8,12 @@ import {
    untracked
 } from "@preact/signals-core";
 
-// signalsF.ts-------------------------------------the following code is for states keep scrolling without paying attention till u see a heart emoji---------------
-var state = signal;
-var derived = computed;
-var DominityReactive = Signal;
+
+ let state = signal;
+ let derived = computed;
+ let  DominityReactive = Signal;
+
+
 
 /**
  *
@@ -628,12 +632,7 @@ export class DominityRouter {
       Object.keys(routeMap).forEach((key) => {
          let routeobj = {};
          let routeData = routeMap[key];
-         routeobj.viewKey = state(
-            routeData.isDefault != null && routeData.isDefault
-         );
-         if (routeData.isDefault != null && routeData.isDefault) {
-            this.defaultPath = key;
-         }
+         routeobj.viewKey = state(false);
          if (routeMap[key].component instanceof DominityElement) {
             routeMap[key].component.showIf(routeobj.viewKey);
          }
@@ -649,10 +648,10 @@ export class DominityRouter {
                   if (routeMap[key].layout != undefined) {
                      component = routeMap[key].layout(component);
                   }
+                  this.root.innerHTML=''
                   this.root.appendChild(
                      component.withRef((r) => {
                         effect(() => {
-                           routeMap[key].componentLoaded = r;
                            if (routeMap[key].onLoad != undefined) {
                               untracked(() => routeMap[key].onLoad(r));
                            }
@@ -662,11 +661,8 @@ export class DominityRouter {
                         });
                      }).elem
                   );
-               } else {
-                  if (routeMap[key].componentLoaded) {
-                     routeMap[key].componentLoaded.remove();
-                  }
-               }
+
+               } 
             });
          }
          this.routeMap[key] = routeobj;
@@ -789,19 +785,23 @@ export function lazy(path) {
 class DominityStore {
    constructor(name, storeData) {
       this._values = {};
+      if(storeData.states){
       Object.keys(storeData.states).forEach((key) => {
          this._values[key] = state(storeData.states[key]);
       });
-
+   }
+      if(storeData.actions){
       Object.keys(storeData.actions).forEach((key) => {
          this[key] = () => {
             storeData.actions[key](this._values, this);
          };
       });
-
+   }
+      if(storeData.getters){
       Object.keys(storeData.getters).forEach((key) => {
          this[key] = derived(storeData.getters[key]);
       });
+      }
    }
 
    getRef(ref) {
@@ -814,7 +814,7 @@ class DominityStore {
       });
       return refer;
    }
-
+   
    getRefs(obj) {
       if (obj && obj.edit) return this._values;
       let refobj = {};
@@ -939,6 +939,19 @@ var htmlTags = [
    "video",
    "wbr",
    "slot"
+   , "svg",
+   "path",
+   "circle",
+   "rect",
+   "polygon",
+   "polyline",
+   "line",
+   "menu",
+   "menuitem",
+   "portal",
+   "ruby",
+   "track"
+
 ];
 var D = htmlTags.reduce((dobj, tag) => {
    dobj[tag] = (...args) => {
@@ -1057,7 +1070,19 @@ export var {
    ul,
    video,
    wbr,
-   slot
+   slot,
+   svg,
+   path,
+   circle,
+   rect,
+   polygon,
+   polyline,
+   line,
+   menu,
+   menuitem,
+   portal,
+   ruby,
+   track,
 } = D;
 
 export {
@@ -1083,5 +1108,6 @@ export default {
    $$el,
    el,
    DominityRouter,
+   untracked,
    DominityElement
 };

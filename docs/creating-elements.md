@@ -49,7 +49,7 @@ Dominity elements handle different types of arguments in specific ways:
 4. **Functions/Template Literals**
    -  Create reactive text nodes that update when state changes
    ```javascript
-   const count = signal(0);
+   const count = state(0);
    div(() => `Count: ${count()}`);
    ```
 
