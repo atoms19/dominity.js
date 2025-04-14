@@ -1,9 +1,8 @@
-## Dominity js
-
 ![DominityBanner](./assets/banner.svg)
 
 [![npm Version](https://img.shields.io/npm/v/dominity.svg)](https://www.npmjs.com/package/dominity) &nbsp;
 [![npm Downloads](https://img.shields.io/npm/dm/dominity.svg)](https://www.npmjs.com/package/dominity) &nbsp;
+
 
 dominity is a minimalist frontend framework to make data heavy single page applications(SPA) which feels snappy and fast. It is performant and lightweight and needs no build step making development of SPA's effortless 
 

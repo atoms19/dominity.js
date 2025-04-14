@@ -1,16 +1,11 @@
 
----
 
-### `model.md`
-
-```md
 # .model() – Two-Way Data Binding
 
 The `.model()` helper in Dominity connects an input field to a reactive `state` variable, enabling automatic synchronization between the DOM and your application's data layer.
 
 It supports all standard form controls: text inputs, checkboxes, radios, textareas, and select elements.
 
----
 
 ## Basic Usage
 
