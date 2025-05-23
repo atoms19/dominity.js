@@ -301,9 +301,6 @@ export class DominityElement {
             seenKeys.add(currKey)
             
          })
-
-         
-         
          for(let key of keyELementMap.keys()){
           if(!seenKeys.has(key)){
             let elemR=keyELementMap.get(key)
@@ -473,7 +470,7 @@ export class DominityElement {
     * @returns {this}
     */
    extend(extension) {
-      Object.assign(this, extension);
+      Object.assign(DominityElement.prototype, extension);
       return this;
    }
 }
