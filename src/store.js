@@ -10,8 +10,8 @@ export class DominityStore {
     }
        if(storeData.actions){
        Object.keys(storeData.actions).forEach((key) => {
-          this[key] = () => {
-             storeData.actions[key](this._values, this);
+          this[key] = (...params) => {
+             storeData.actions[key](this._values, this,...params);
           };
        });
     }
