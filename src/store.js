@@ -17,7 +17,7 @@ export class DominityStore {
     }
        if(storeData.getters){
        Object.keys(storeData.getters).forEach((key) => {
-          this[key] = derived(storeData.getters[key]);
+          this[key] = derived(storeData.getters[key].bind(this._values));
        });
        }
     }
